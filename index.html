@@ -479,6 +479,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .pwa-banner-close{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:1.1rem;padding:0 0 0 .25rem;flex-shrink:0;}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 
+/* FORNECEDORES */
+.forn-item{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:.875rem 1rem;margin-bottom:.625rem;box-shadow:var(--shadow);}
+.forn-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;}
+.forn-nome{font-size:.92rem;font-weight:700;color:var(--text);}
+.forn-fantasia{font-size:.75rem;color:var(--text-muted);margin-top:1px;}
+.forn-info{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+.forn-tag{font-size:.7rem;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text-muted);}
+.forn-actions{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;}
+
 @media(max-width:380px){.stats-row{grid-template-columns:repeat(2,1fr);}.card-value{font-size:1.3rem;}}
 </style>
 </head>
@@ -625,6 +634,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <span class="quick-btn-icon">📊</span>
           <span class="quick-btn-text">Relatório</span>
         </button>
+        <button class="quick-btn" onclick="abrirFornecedores()">
+          <span class="quick-btn-icon">🏭</span>
+          <span class="quick-btn-text">Fornecedores</span>
+        </button>
       </div>
 
       <p class="section-title"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span> Quem está devendo</p>
@@ -692,7 +705,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       </div>
       <div class="search-bar">
         <span class="search-icon"><span class="ico" style="width:16px;height:16px"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></span>
-        <input type="text" class="search-input" placeholder="Buscar produto...">
+        <input type="text" class="search-input" placeholder="Buscar produto..." oninput="buscarCatalogo(this.value)">
       </div>
       <div id="stockAlertBar" class="stock-alert-bar"></div>
       <div id="catalogoList">
@@ -1229,12 +1242,110 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="modal-overlay" id="modalRelatorio">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3 class="modal-title">📊 Relatório Mensal</h3>
+    <h3 class="modal-title">📊 Relatório</h3>
+    <!-- FILTROS -->
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap;">
+      <select class="form-input" id="relMes" style="flex:1;font-size:.82rem;" onchange="gerarRelatorio()">
+        <option value="todos">Todos os meses</option>
+        <option value="0">Janeiro</option>
+        <option value="1">Fevereiro</option>
+        <option value="2">Março</option>
+        <option value="3">Abril</option>
+        <option value="4">Maio</option>
+        <option value="5">Junho</option>
+        <option value="6">Julho</option>
+        <option value="7">Agosto</option>
+        <option value="8">Setembro</option>
+        <option value="9">Outubro</option>
+        <option value="10">Novembro</option>
+        <option value="11">Dezembro</option>
+      </select>
+      <select class="form-input" id="relDia" style="width:90px;font-size:.82rem;" onchange="gerarRelatorio()">
+        <option value="todos">Todos os dias</option>
+      </select>
+    </div>
     <div id="relatorioConteudo"></div>
     <br>
     <button class="btn btn-primary" onclick="compartilharRelatorio()">Compartilhar via WhatsApp</button>
     <br><br>
     <button class="btn" style="background:var(--bg);color:var(--text-muted)" onclick="closeModal('modalRelatorio')">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL FORNECEDORES (lista) -->
+<div class="modal-overlay" id="modalFornecedores">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+      <h3 class="modal-title" style="margin:0;">🏭 Fornecedores</h3>
+      <button class="btn-prod-edit" onclick="abrirNovoFornecedor()">+ Novo</button>
+    </div>
+    <div class="search-bar" style="margin-bottom:.75rem;">
+      <span class="search-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input type="text" class="search-input" placeholder="Buscar fornecedor..." oninput="buscarFornecedor(this.value)">
+    </div>
+    <div id="fornecedoresList" style="max-height:420px;overflow-y:auto;"></div>
+    <br>
+    <button class="btn" style="background:var(--bg);color:var(--text-muted);width:100%;" onclick="closeModal('modalFornecedores')">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL CADASTRO FORNECEDOR -->
+<div class="modal-overlay" id="modalFornecedorForm">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title"><span id="fornFormTituloTxt">Novo Fornecedor</span></h3>
+    <input type="hidden" id="fornEditId">
+
+    <div class="form-group">
+      <label class="form-label">CNPJ ou CPF</label>
+      <div style="display:flex;gap:.4rem;">
+        <input type="text" class="form-input" id="fornCnpj" placeholder="00.000.000/0000-00" style="flex:1;">
+        <button type="button" onclick="buscarCnpj()" style="flex-shrink:0;background:var(--rose);color:white;border:none;border-radius:12px;padding:0 .9rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Buscar</button>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Razão Social *</label><input type="text" class="form-input" id="fornRazao" placeholder="Nome empresarial"></div>
+    <div class="form-group"><label class="form-label">Fantasia</label><input type="text" class="form-input" id="fornFantasia" placeholder="Nome fantasia"></div>
+    <div class="form-group"><label class="form-label">Insc. Estadual / RG <span style="font-size:.7rem;color:var(--text-muted);">(opcional)</span></label><input type="text" class="form-input" id="fornInscEstadual" placeholder="Opcional"></div>
+
+    <div style="height:1px;background:var(--border);margin:.5rem 0 .75rem;"></div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Endereço</div>
+    <div class="form-group">
+      <label class="form-label">CEP</label>
+      <div style="display:flex;gap:.4rem;">
+        <input type="text" class="form-input" id="fornCep" placeholder="00000-000" style="flex:1;" oninput="formatarCep(this)">
+        <button type="button" onclick="buscarCep()" style="flex-shrink:0;background:var(--rose);color:white;border:none;border-radius:12px;padding:0 .9rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Buscar</button>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input" id="fornEndereco" placeholder="Rua, Avenida..."></div>
+    <div style="display:flex;gap:.5rem;">
+      <div class="form-group" style="flex:1;"><label class="form-label">Número</label><input type="text" class="form-input" id="fornNumero" placeholder="Nº"></div>
+      <div class="form-group" style="flex:1;"><label class="form-label">Complemento</label><input type="text" class="form-input" id="fornComplemento" placeholder="Apto, Sala..."></div>
+    </div>
+    <div class="form-group"><label class="form-label">Bairro</label><input type="text" class="form-input" id="fornBairro" placeholder="Bairro"></div>
+    <div style="display:flex;gap:.5rem;">
+      <div class="form-group" style="flex:1;"><label class="form-label">Cidade</label><input type="text" class="form-input" id="fornCidade" placeholder="Cidade"></div>
+      <div class="form-group" style="width:70px;"><label class="form-label">UF</label><input type="text" class="form-input" id="fornUf" placeholder="UF" maxlength="2" style="text-transform:uppercase;"></div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:.5rem 0 .75rem;"></div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Contato</div>
+    <div class="form-group"><label class="form-label">Contato (nome)</label><input type="text" class="form-input" id="fornContato" placeholder="Nome do responsável"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input type="tel" class="form-input" id="fornTelefone" placeholder="(00) 0000-0000"></div>
+    <div class="form-group"><label class="form-label">Celular / WhatsApp</label><input type="tel" class="form-input" id="fornCelular" placeholder="(00) 00000-0000"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" id="fornEmail" placeholder="fornecedor@email.com"></div>
+    <div class="form-group"><label class="form-label">Site</label><input type="url" class="form-input" id="fornSite" placeholder="https://site.com.br"></div>
+    <div class="form-group"><label class="form-label">Instagram</label>
+      <div style="position:relative;">
+        <span style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:.85rem;font-weight:700;color:var(--text-muted);">@</span>
+        <input type="text" class="form-input" id="fornInstagram" placeholder="usuario" style="padding-left:2.2rem;">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Observações</label><input type="text" class="form-input" id="fornObs" placeholder="Ex: Mínimo de pedido, prazo de entrega..."></div>
+
+    <button class="btn btn-primary" id="btnSalvarFornecedor" onclick="salvarFornecedor()">Salvar Fornecedor</button>
+    <br><br>
+    <button class="btn" style="background:var(--bg);color:var(--text-muted)" onclick="fecharModalFornecedor()">Cancelar</button>
   </div>
 </div>
 
@@ -1253,6 +1364,7 @@ function salvarStorage(){
   localStorage.setItem('rp_darkMode',JSON.stringify(darkMode));
   localStorage.setItem('rp_despesas',JSON.stringify(despesas));
   localStorage.setItem('rp_meta',JSON.stringify(metaMensal));
+  localStorage.setItem('rp_fornecedores',JSON.stringify(fornecedores));
 }
 function carregarStorage(){
   try{clientes=JSON.parse(localStorage.getItem('rp_clientes'))||[];}catch(e){clientes=[];}
@@ -1262,6 +1374,7 @@ function carregarStorage(){
   try{darkMode=JSON.parse(localStorage.getItem('rp_darkMode'))||false;}catch(e){darkMode=false;}
   try{despesas=JSON.parse(localStorage.getItem('rp_despesas'))||[];}catch(e){despesas=[];}
   try{metaMensal=JSON.parse(localStorage.getItem('rp_meta'))||0;}catch(e){metaMensal=0;}
+  try{fornecedores=JSON.parse(localStorage.getItem('rp_fornecedores'))||[];}catch(e){fornecedores=[];}
 }
 
 let userData={name:'',email:''};
@@ -1271,6 +1384,7 @@ let produtos=[];
 let darkMode=false;
 let despesas=[];
 let metaMensal=0;
+let fornecedores=[];
 
 function login(){
   const email=document.getElementById('loginEmail').value.trim();
@@ -1717,6 +1831,7 @@ function openModal(id){
     return;
   }
   if(id==='modalPedido'){
+    populateSelects();
     document.getElementById('pedEditId').value='';
     document.getElementById('modalPedidoTituloTxt').textContent='Novo Pedido';
     document.getElementById('btnRegistrarPedido').textContent='Registrar Pedido';
@@ -1874,6 +1989,7 @@ function renderClientes(filtro){
       <div class="list-right">
         ${divida>0?`<div class="list-value" style="color:${bloqueado?'var(--rose)':'var(--rose)'}">R$ ${divida.toFixed(2).replace('.',',')}</div><span class="list-status status-deve">Deve</span>`:'<span class="list-status status-pago">Em dia</span>'}
         ${c.whats&&divida>0?`<br><button class="whatsapp-btn" style="margin-top:4px;" onclick="cobrarWhats('${escapeHtml(c.nome)}','${escapeHtml(c.whats)}',${divida})"><span class="ico" style="width:12px;height:12px"><svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span> Cobrar</button>`:''}
+        ${divida>0?`<br><button class="btn-pagar" style="margin-top:4px;font-size:.7rem;padding:.28rem .7rem;" onclick="quitarTudo(${c.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Quitar tudo</button>`:''}
       </div>
       <div style="width:100%;padding-top:.4rem;border-top:1px solid var(--border);margin-top:.3rem;display:flex;gap:.4rem;">
         <button class="btn-editar" style="font-size:.7rem;padding:.25rem .65rem;" onclick="abrirEditarCliente(${c.id})">
@@ -1908,8 +2024,14 @@ function searchClients(q){
 
 }
 function populateSelects(){
-  document.getElementById('pedCliente').innerHTML='<option value="">Selecione uma cliente</option>'+clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
-  document.getElementById('pedProduto').innerHTML='<option value="">Selecione um produto</option>'+produtos.map(p=>`<option value="${p.id}" data-preco="${p.preco}">${p.nome} — R$ ${parseFloat(p.preco).toFixed(2)}</option>`).join('');
+  document.getElementById('pedCliente').innerHTML='<option value="">Selecione uma cliente</option>'+clientes.map(c=>`<option value="${c.id}">${escapeHtml(c.nome)}</option>`).join('');
+  document.getElementById('pedProduto').innerHTML='<option value="">Selecione um produto</option>'+produtos.map(p=>{
+    const semEstoque=p.estoque<=0;
+    const label=semEstoque
+      ?`${p.nome} — SEM ESTOQUE`
+      :`${p.nome} — R$ ${parseFloat(p.preco).toFixed(2)} (${p.estoque} un.)`;
+    return `<option value="${p.id}" data-preco="${p.preco}" ${semEstoque?'disabled style="color:#aaa"':''}>${escapeHtml(label)}</option>`;
+  }).join('');
 }
 function preencherValor(){
   const sel=document.getElementById('pedProduto');
@@ -1930,12 +2052,34 @@ function salvarPedido(){
   const cli=clientes.find(c=>c.id===Number(cliId));
   const prod=produtos.find(p=>p.id===Number(prodId));
 
-  // TETO check only on new pending orders (not edits converting to paid)
-  if(!editId && pagamento==='pendente'&&cli&&cli.teto>0){
-    const novaDiv=(cli.divida||0)+valor;
-    if(novaDiv>cli.teto){
-      showToast(`Bloqueado! Teto de R$ ${cli.teto.toFixed(2).replace('.',',')} seria excedido`);
+  // ESTOQUE: bloquear se zerado (exceto edição e cancelado)
+  if(!editId && pagamento!=='cancelado' && prod){
+    if(prod.estoque<=0){
+      showToast('Estoque zerado! Atualize o estoque do produto para vender.');
       return;
+    }
+    if(qtd>prod.estoque){
+      showToast(`Estoque insuficiente! Disponível: ${prod.estoque} un.`);
+      return;
+    }
+  }
+
+  // TETO: bloquear QUALQUER novo pedido se cliente atingiu o teto
+  // (exceto edição, cancelamento e pagamentos que quitam a dívida)
+  if(!editId && pagamento!=='cancelado' && cli && cli.teto>0){
+    const divAtual=cli.divida||0;
+    // se já está no teto ou acima — bloqueia qualquer nova compra
+    if(divAtual>=cli.teto){
+      showToast(`🚫 ${cli.nome} está bloqueada! Teto de R$ ${cli.teto.toFixed(2).replace('.',',')} atingido. Quite a dívida para liberar.`);
+      return;
+    }
+    // se o novo pedido pendente ultrapassaria o teto
+    if(pagamento==='pendente'){
+      const novaDiv=divAtual+valor;
+      if(novaDiv>cli.teto){
+        showToast(`🚫 Bloqueado! Esse pedido ultrapassaria o teto de R$ ${cli.teto.toFixed(2).replace('.',',')}. Disponível: R$ ${(cli.teto-divAtual).toFixed(2).replace('.',',')}`);
+        return;
+      }
     }
   }
 
@@ -1976,6 +2120,7 @@ function salvarPedido(){
   }
   fecharModalPedido();
   renderPedidos();renderFinancas();atualizarDashboard();renderCatalogo();
+  if(pagamento==='pago') tocarSomVenda();
   showToast('Pedido registrado!');
 }
 // ── PEDIDO: MARCAR PAGO, EDITAR, EXCLUIR ──────────────────────
@@ -1996,7 +2141,24 @@ function marcarPago(id){
     adicionarNotificacao({tipo:'paid',titulo:'Parabéns! Venda realizada',desc:`R$ ${p.valor.toFixed(2).replace('.',',')} recebido de ${p.cliente}`,hora:new Date().toISOString()});
   }
   renderPedidos();renderClientes('all');renderFinancas();atualizarDashboard();
+  tocarSomVenda();
   showToast('Pagamento confirmado!');
+}
+function quitarTudo(cliId){
+  const cli=clientes.find(c=>c.id===cliId);
+  if(!cli)return;
+  // mark all pending orders as paid
+  const pendentes=pedidos.filter(p=>p.cliId===cliId&&p.pagamento==='pendente');
+  if(!pendentes.length){showToast('Nenhuma pendência encontrada');return;}
+  pendentes.forEach(p=>p.pagamento='pago');
+  recalcularDividas();
+  salvarStorage();
+  const prefs=getPrefsNotif();
+  if(prefs.pago){
+    adicionarNotificacao({tipo:'paid',titulo:'Dívida quitada!',desc:`${cli.nome} quitou todas as pendências.`,hora:new Date().toISOString()});
+  }
+  renderPedidos();renderClientes('all');renderFinancas();atualizarDashboard();
+  showToast(`✅ ${cli.nome} — dívida quitada! Compras liberadas.`);
 }
 function abrirEditarPedido(id){
   const p=pedidos.find(x=>x.id===id);
@@ -2178,6 +2340,47 @@ function salvarProduto(){
   showToast('Produto salvo!');
 }
 // ── END PRODUTO ────────────────────────────────────────────────
+function buscarCatalogo(q){
+  const list=document.getElementById('catalogoList');
+  const alertBar=document.getElementById('stockAlertBar');
+  if(!q.trim()){renderCatalogo();return;}
+  const data=produtos.filter(p=>
+    p.nome.toLowerCase().includes(q.toLowerCase())||
+    (p.cat&&p.cat.toLowerCase().includes(q.toLowerCase()))||
+    (p.desc&&p.desc.toLowerCase().includes(q.toLowerCase()))
+  );
+  if(alertBar) alertBar.classList.remove('show');
+  if(!data.length){
+    list.innerHTML='<div class="empty-state"><div class="icon"><span class="ico" style="width:36px;height:36px"><svg width="36" height="36" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div><h3>Nenhum resultado</h3><p>Tente outro nome ou categoria</p></div>';
+    return;
+  }
+  list.innerHTML=data.map(p=>{
+    const baixoEstoque=p.estoqueMin>0&&p.estoque<=p.estoqueMin;
+    const imgHtml=p.foto
+      ?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nome)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+      :`<span class="ico" style="width:22px;height:22px"><svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/></svg></span>`;
+    return `
+    <div class="product-card">
+      <div class="product-img">${imgHtml}</div>
+      <div class="product-info">
+        <div class="product-name">${escapeHtml(p.nome)}</div>
+        <div class="product-cat">${escapeHtml(p.cat)}</div>
+        ${p.desc?`<div class="product-desc">${escapeHtml(p.desc)}</div>`:''}
+      </div>
+      <div class="product-right">
+        <div class="product-price">R$ ${p.preco.toFixed(2).replace('.',',')}</div>
+        <div class="product-stock${baixoEstoque?' low':''}">
+          ${p.estoque} un.${baixoEstoque?`<span class="stock-alert-badge">Baixo</span>`:''}
+        </div>
+        ${p.custo?`<div class="product-profit">+R$ ${(p.preco-p.custo).toFixed(2).replace('.',',')}</div>`:''}
+      </div>
+      <div class="product-actions">
+        <button class="btn-prod-edit" onclick="abrirEditarProduto(${p.id})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
+        <button class="btn-prod-del" onclick="confirmarExcluirProduto(${p.id})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 function renderCatalogo(){
   const list=document.getElementById('catalogoList');
   // stock alert bar
@@ -2857,6 +3060,30 @@ function prSelecionarPagto(v){
 }
 function confirmarPedidoRapido(){
   if(!_prCli||!_prProd){showToast('Selecione cliente e produto');return;}
+  // ESTOQUE: bloquear se zerado
+  if(_prProd.estoque<=0){
+    showToast('Estoque zerado! Atualize o estoque do produto para vender.');
+    return;
+  }
+  if(_prQtd>_prProd.estoque){
+    showToast(`Estoque insuficiente! Disponível: ${_prProd.estoque} un.`);
+    return;
+  }
+  // TETO: bloquear se cliente atingiu o limite
+  if(_prCli.teto>0){
+    const divAtual=_prCli.divida||0;
+    if(divAtual>=_prCli.teto){
+      showToast(`🚫 ${_prCli.nome} está bloqueada! Teto de R$ ${_prCli.teto.toFixed(2).replace('.',',')} atingido.`);
+      return;
+    }
+    if(_prPagto==='pendente'){
+      const novaDiv=divAtual+(_prProd.preco*_prQtd);
+      if(novaDiv>_prCli.teto){
+        showToast(`🚫 Pedido ultrapassaria o teto! Disponível: R$ ${(_prCli.teto-divAtual).toFixed(2).replace('.',',')}`);
+        return;
+      }
+    }
+  }
   const valor=_prProd.preco*_prQtd;
   pedidos.push({id:Date.now(),cliId:_prCli.id,prodId:_prProd.id,valor,pagamento:_prPagto,qtd:_prQtd,
     data:new Date().toLocaleDateString('pt-BR'),cliente:_prCli.nome,produto:_prProd.nome,entrega:'aguardando'});
@@ -2866,11 +3093,44 @@ function confirmarPedidoRapido(){
   dispararNotifPedido(pedidos[pedidos.length-1],_prCli);
   document.getElementById('prapidoOverlay').classList.remove('open');
   renderPedidos();renderClientes('all');atualizarDashboard();renderCatalogo();
+  tocarSomVenda();
   showToast('Venda registrada! ⚡');
 }
 // ── END PEDIDO RÁPIDO ─────────────────────────────────────────
 
-// ── LISTA DE REPOSIÇÃO ────────────────────────────────────────
+// ── SOM DE VENDA ──────────────────────────────────────────────
+function tocarSomVenda(){
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    // Sequência de notas: moeda caindo + caixa registradora
+    var notas=[
+      {freq:1200,dur:0.06,inicio:0,vol:0.3},
+      {freq:1600,dur:0.06,inicio:0.07,vol:0.35},
+      {freq:2000,dur:0.08,inicio:0.14,vol:0.4},
+      {freq:1800,dur:0.06,inicio:0.22,vol:0.3},
+      {freq:2400,dur:0.12,inicio:0.29,vol:0.45},
+      {freq:2000,dur:0.08,inicio:0.40,vol:0.25},
+      {freq:2600,dur:0.15,inicio:0.48,vol:0.5}
+    ];
+    notas.forEach(function(n){
+      var osc=ctx.createOscillator();
+      var gain=ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(n.freq,ctx.currentTime+n.inicio);
+      osc.frequency.exponentialRampToValueAtTime(n.freq*0.85,ctx.currentTime+n.inicio+n.dur);
+      gain.gain.setValueAtTime(0,ctx.currentTime+n.inicio);
+      gain.gain.linearRampToValueAtTime(n.vol,ctx.currentTime+n.inicio+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n.inicio+n.dur);
+      osc.start(ctx.currentTime+n.inicio);
+      osc.stop(ctx.currentTime+n.inicio+n.dur+0.01);
+    });
+    // fecha o contexto após o som terminar
+    setTimeout(function(){try{ctx.close();}catch(e){}},800);
+  }catch(e){}
+}
+// ── END SOM DE VENDA ──────────────────────────────────────────
 function abrirReposicao(){
   const lista=produtos.filter(p=>p.estoque<=Math.max(p.estoqueMin||0,2)||p.estoque===0);
   const el=document.getElementById('reposicaoLista');
@@ -2951,16 +3211,51 @@ function atualizarEntrega(pedidoId, status){
 // ── RELATÓRIO MENSAL ──────────────────────────────────────────
 function abrirRelatorio(){
   const hoje=new Date();
-  const mes=hoje.getMonth();
-  const ano=hoje.getFullYear();
+  // pre-select current month
+  document.getElementById('relMes').value=hoje.getMonth();
+  atualizarDiasRelatorio();
+  gerarRelatorio();
+  document.getElementById('modalRelatorio').classList.add('open');
+}
+function atualizarDiasRelatorio(){
+  const mesVal=document.getElementById('relMes').value;
+  const sel=document.getElementById('relDia');
+  const diaAtual=sel.value;
+  sel.innerHTML='<option value="todos">Todos os dias</option>';
+  if(mesVal==='todos'){sel.value='todos';return;}
+  const mes=parseInt(mesVal);
+  const ano=new Date().getFullYear();
+  const totalDias=new Date(ano,mes+1,0).getDate();
+  for(let d=1;d<=totalDias;d++){
+    const opt=document.createElement('option');
+    opt.value=d; opt.textContent='Dia '+d;
+    sel.appendChild(opt);
+  }
+  sel.value=diaAtual&&diaAtual!=='todos'?diaAtual:'todos';
+}
+function gerarRelatorio(){
+  atualizarDiasRelatorio();
+  const mesVal=document.getElementById('relMes').value;
+  const diaVal=document.getElementById('relDia').value;
   const nomesMes=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const pedsMes=pedidos.filter(p=>{
+  const ano=new Date().getFullYear();
+  const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+
+  // filter pedidos
+  const pedsFilt=pedidos.filter(p=>{
     const parts=p.data.split('/');
-    return parts.length>=3&&parseInt(parts[1])-1===mes&&parseInt(parts[2])===ano;
+    if(parts.length<3) return false;
+    const pDia=parseInt(parts[0]);
+    const pMes=parseInt(parts[1])-1;
+    const pAno=parseInt(parts[2]);
+    if(mesVal!=='todos'&&pMes!==parseInt(mesVal)) return false;
+    if(diaVal!=='todos'&&pDia!==parseInt(diaVal)) return false;
+    return true;
   });
-  const pEdidos=pedsMes.filter(p=>p.pagamento!=='cancelado');
-  const pPagos=pedsMes.filter(p=>p.pagamento==='pago');
-  const pPend=pedsMes.filter(p=>p.pagamento==='pendente');
+
+  const pEdidos=pedsFilt.filter(p=>p.pagamento!=='cancelado');
+  const pPagos=pedsFilt.filter(p=>p.pagamento==='pago');
+  const pPend=pedsFilt.filter(p=>p.pagamento==='pendente');
   const totalVendas=pEdidos.reduce((s,p)=>s+p.valor,0);
   const totalRecebido=pPagos.reduce((s,p)=>s+p.valor,0);
   const totalPend=pPend.reduce((s,p)=>s+p.valor,0);
@@ -2969,15 +3264,26 @@ function abrirRelatorio(){
     const c=prod&&prod.custo?prod.custo:0;
     return s+(c?(p.valor-c*p.qtd):p.valor*0.25);
   },0);
-  const despMes=despesas.filter(d=>d.mes===mes&&d.ano===ano);
-  const totalDesp=despMes.reduce((s,d)=>s+d.valor,0);
+  // filter despesas
+  const despFilt=despesas.filter(d=>{
+    if(mesVal!=='todos'&&d.mes!==parseInt(mesVal)) return false;
+    return true;
+  });
+  const totalDesp=despFilt.reduce((s,d)=>s+d.valor,0);
   const lucroReal=lucro-totalDesp;
   const inadimpl=clientes.filter(c=>(c.divida||0)>0).length;
-  const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+
+  // period label
+  let periodoLabel='Todos os períodos';
+  if(mesVal!=='todos'){
+    periodoLabel=nomesMes[parseInt(mesVal)]+' '+ano;
+    if(diaVal!=='todos') periodoLabel='Dia '+diaVal+' de '+nomesMes[parseInt(mesVal)];
+  }
+
   document.getElementById('relatorioConteudo').innerHTML=`
     <div style="text-align:center;margin-bottom:1rem;">
-      <div style="font-size:1rem;font-weight:700;color:var(--text);">${nomesMes[mes]} ${ano}</div>
-      <div style="font-size:.75rem;color:var(--text-muted);">Relatório gerado em ${hoje.toLocaleDateString('pt-BR')}</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text);">${periodoLabel}</div>
+      <div style="font-size:.75rem;color:var(--text-muted);">Gerado em ${new Date().toLocaleDateString('pt-BR')}</div>
     </div>
     <div class="rel-section">
       <div style="font-size:.72rem;font-weight:700;color:var(--rose);text-transform:uppercase;margin-bottom:.4rem;">Vendas</div>
@@ -2997,23 +3303,33 @@ function abrirRelatorio(){
       <div class="rel-row"><span class="rel-label">Total de clientes</span><span class="rel-val">${clientes.length}</span></div>
       <div class="rel-row"><span class="rel-label">Com dívida ativa</span><span class="rel-val" style="color:var(--rose)">${inadimpl}</span></div>
     </div>`;
-  document.getElementById('modalRelatorio').classList.add('open');
 }
 function compartilharRelatorio(){
-  const hoje=new Date();
+  const mesVal=document.getElementById('relMes')?document.getElementById('relMes').value:'todos';
+  const diaVal=document.getElementById('relDia')?document.getElementById('relDia').value:'todos';
   const nomesMes=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const mes=hoje.getMonth();
-  const ano=hoje.getFullYear();
-  const pedsMes=pedidos.filter(p=>{const parts=p.data.split('/');return parts.length>=3&&parseInt(parts[1])-1===mes&&parseInt(parts[2])===ano;});
-  const pPagos=pedsMes.filter(p=>p.pagamento==='pago');
-  const pPend=pedsMes.filter(p=>p.pagamento==='pendente');
-  const total=pedsMes.filter(p=>p.pagamento!=='cancelado').reduce((s,p)=>s+p.valor,0);
+  const ano=new Date().getFullYear();
+  const pedsFilt=pedidos.filter(p=>{
+    const parts=p.data.split('/');
+    if(parts.length<3) return false;
+    if(mesVal!=='todos'&&parseInt(parts[1])-1!==parseInt(mesVal)) return false;
+    if(diaVal!=='todos'&&parseInt(parts[0])!==parseInt(diaVal)) return false;
+    return true;
+  });
+  const pPagos=pedsFilt.filter(p=>p.pagamento==='pago');
+  const pPend=pedsFilt.filter(p=>p.pagamento==='pendente');
+  const total=pedsFilt.filter(p=>p.pagamento!=='cancelado').reduce((s,p)=>s+p.valor,0);
   const recebido=pPagos.reduce((s,p)=>s+p.valor,0);
   const lucro=pPagos.reduce((s,p)=>{const pr=produtos.find(x=>x.id===p.prodId);const c=pr&&pr.custo?pr.custo:0;return s+(c?(p.valor-c*p.qtd):p.valor*0.25);},0);
-  const desp=despesas.filter(d=>d.mes===mes&&d.ano===ano).reduce((s,d)=>s+d.valor,0);
+  const desp=despesas.filter(d=>mesVal==='todos'||d.mes===parseInt(mesVal)).reduce((s,d)=>s+d.valor,0);
   const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
-  const msg=`*Relatório ${nomesMes[mes]} ${ano} — Revenda Pro*\n\n`+
-    `Pedidos: ${pedsMes.filter(p=>p.pagamento!=='cancelado').length}\n`+
+  let periodo='Todos os períodos';
+  if(mesVal!=='todos'){
+    periodo=nomesMes[parseInt(mesVal)]+' '+ano;
+    if(diaVal!=='todos') periodo='Dia '+diaVal+' de '+nomesMes[parseInt(mesVal)];
+  }
+  const msg=`*Relatório ${periodo} — Revenda Pro*\n\n`+
+    `Pedidos: ${pedsFilt.filter(p=>p.pagamento!=='cancelado').length}\n`+
     `Total vendido: ${fmt(total)}\n`+
     `Recebido: ${fmt(recebido)}\n`+
     `A receber: ${fmt(pPend.reduce((s,p)=>s+p.valor,0))}\n`+
@@ -3171,6 +3487,187 @@ function fecharPwaBanner(){
   localStorage.setItem('pwa_dismissed','1');
 }
 // ── END PWA ───────────────────────────────────────────────────
+
+// ── FORNECEDORES ──────────────────────────────────────────────
+function abrirFornecedores(){
+  renderFornecedores(fornecedores);
+  document.getElementById('modalFornecedores').classList.add('open');
+}
+function renderFornecedores(lista){
+  const el=document.getElementById('fornecedoresList');
+  if(!lista.length){
+    el.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:.82rem;">Nenhum fornecedor cadastrado.<br>Toque em "+ Novo" para adicionar.</div>';
+    return;
+  }
+  el.innerHTML=lista.map(f=>`
+    <div class="forn-item">
+      <div class="forn-header">
+        <div>
+          <div class="forn-nome">${escapeHtml(f.razao)}</div>
+          ${f.fantasia?`<div class="forn-fantasia">${escapeHtml(f.fantasia)}</div>`:''}
+        </div>
+        <div style="display:flex;gap:.3rem;">
+          <button class="btn-prod-edit" style="font-size:.68rem;padding:.22rem .55rem;" onclick="abrirEditarFornecedor(${f.id})">Editar</button>
+          <button class="btn-prod-del" style="font-size:.68rem;padding:.22rem .55rem;" onclick="confirmarExcluirFornecedor(${f.id})">✕</button>
+        </div>
+      </div>
+      <div class="forn-info">
+        ${f.cnpj?`<span class="forn-tag">📄 ${escapeHtml(f.cnpj)}</span>`:''}
+        ${f.cidade?`<span class="forn-tag">📍 ${escapeHtml(f.cidade)}${f.uf?' - '+escapeHtml(f.uf):''}</span>`:''}
+        ${f.celular?`<span class="forn-tag">📱 ${escapeHtml(f.celular)}</span>`:''}
+        ${f.email?`<span class="forn-tag">✉️ ${escapeHtml(f.email)}</span>`:''}
+        ${f.instagram?`<span class="forn-tag">📸 @${escapeHtml(f.instagram)}</span>`:''}
+        ${f.site?`<span class="forn-tag">🌐 ${escapeHtml(f.site)}</span>`:''}
+      </div>
+      ${f.obs?`<div style="font-size:.72rem;color:var(--text-muted);margin-top:.35rem;">${escapeHtml(f.obs)}</div>`:''}
+      <div class="forn-actions">
+        ${f.celular?`<button class="whatsapp-btn" style="font-size:.7rem;" onclick="window.open('https://wa.me/55'+('${escapeHtml(f.celular)}').replace(/\\D/g,''),'_blank')"><span class="ico" style="width:11px;height:11px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span> WhatsApp</button>`:'' }
+        ${f.instagram?`<button class="btn-prod-edit" style="font-size:.7rem;padding:.25rem .6rem;" onclick="window.open('https://instagram.com/${escapeHtml(f.instagram)}','_blank')">Instagram</button>`:''}
+      </div>
+    </div>`).join('');
+}
+function buscarFornecedor(q){
+  if(!q.trim()){renderFornecedores(fornecedores);return;}
+  const data=fornecedores.filter(f=>
+    f.razao.toLowerCase().includes(q.toLowerCase())||
+    (f.fantasia&&f.fantasia.toLowerCase().includes(q.toLowerCase()))||
+    (f.cidade&&f.cidade.toLowerCase().includes(q.toLowerCase()))
+  );
+  renderFornecedores(data);
+}
+function abrirNovoFornecedor(){
+  limparFormFornecedor();
+  document.getElementById('fornFormTituloTxt').textContent='Novo Fornecedor';
+  document.getElementById('btnSalvarFornecedor').textContent='Salvar Fornecedor';
+  document.getElementById('modalFornecedorForm').classList.add('open');
+}
+function abrirEditarFornecedor(id){
+  const f=fornecedores.find(x=>x.id===id);
+  if(!f)return;
+  limparFormFornecedor();
+  document.getElementById('fornEditId').value=id;
+  document.getElementById('fornFormTituloTxt').textContent='Editar Fornecedor';
+  document.getElementById('btnSalvarFornecedor').textContent='Salvar Alterações';
+  document.getElementById('fornCnpj').value=f.cnpj||'';
+  document.getElementById('fornRazao').value=f.razao||'';
+  document.getElementById('fornFantasia').value=f.fantasia||'';
+  document.getElementById('fornInscEstadual').value=f.inscEstadual||'';
+  document.getElementById('fornCep').value=f.cep||'';
+  document.getElementById('fornEndereco').value=f.endereco||'';
+  document.getElementById('fornNumero').value=f.numero||'';
+  document.getElementById('fornComplemento').value=f.complemento||'';
+  document.getElementById('fornBairro').value=f.bairro||'';
+  document.getElementById('fornCidade').value=f.cidade||'';
+  document.getElementById('fornUf').value=f.uf||'';
+  document.getElementById('fornContato').value=f.contato||'';
+  document.getElementById('fornTelefone').value=f.telefone||'';
+  document.getElementById('fornCelular').value=f.celular||'';
+  document.getElementById('fornEmail').value=f.email||'';
+  document.getElementById('fornSite').value=f.site||'';
+  document.getElementById('fornInstagram').value=f.instagram||'';
+  document.getElementById('fornObs').value=f.obs||'';
+  document.getElementById('modalFornecedorForm').classList.add('open');
+}
+function fecharModalFornecedor(){
+  limparFormFornecedor();
+  closeModal('modalFornecedorForm');
+}
+function limparFormFornecedor(){
+  document.getElementById('fornEditId').value='';
+  ['fornCnpj','fornRazao','fornFantasia','fornInscEstadual','fornCep','fornEndereco',
+   'fornNumero','fornComplemento','fornBairro','fornCidade','fornUf','fornContato',
+   'fornTelefone','fornCelular','fornEmail','fornSite','fornInstagram','fornObs']
+    .forEach(function(id){document.getElementById(id).value='';});
+}
+function salvarFornecedor(){
+  var editId=document.getElementById('fornEditId').value;
+  var razao=document.getElementById('fornRazao').value.trim();
+  if(!razao){showToast('Informe a Razão Social');return;}
+  var f={
+    razao:razao,
+    cnpj:document.getElementById('fornCnpj').value.trim(),
+    fantasia:document.getElementById('fornFantasia').value.trim(),
+    inscEstadual:document.getElementById('fornInscEstadual').value.trim(),
+    cep:document.getElementById('fornCep').value.trim(),
+    endereco:document.getElementById('fornEndereco').value.trim(),
+    numero:document.getElementById('fornNumero').value.trim(),
+    complemento:document.getElementById('fornComplemento').value.trim(),
+    bairro:document.getElementById('fornBairro').value.trim(),
+    cidade:document.getElementById('fornCidade').value.trim(),
+    uf:document.getElementById('fornUf').value.trim().toUpperCase(),
+    contato:document.getElementById('fornContato').value.trim(),
+    telefone:document.getElementById('fornTelefone').value.trim(),
+    celular:document.getElementById('fornCelular').value.trim(),
+    email:document.getElementById('fornEmail').value.trim(),
+    site:document.getElementById('fornSite').value.trim(),
+    instagram:document.getElementById('fornInstagram').value.trim().replace('@',''),
+    obs:document.getElementById('fornObs').value.trim()
+  };
+  if(editId){
+    var idx=fornecedores.findIndex(function(x){return x.id===Number(editId);});
+    if(idx!==-1) fornecedores[idx]=Object.assign({},fornecedores[idx],f);
+    showToast('Fornecedor atualizado!');
+  } else {
+    f.id=Date.now();
+    fornecedores.push(f);
+    showToast('Fornecedor salvo!');
+  }
+  salvarStorage();
+  fecharModalFornecedor();
+  renderFornecedores(fornecedores);
+}
+function confirmarExcluirFornecedor(id){
+  var f=fornecedores.find(function(x){return x.id===id;});
+  if(!f)return;
+  var bar=document.getElementById('confirmBar');
+  document.getElementById('confirmMsg').textContent='Excluir "'+f.razao+'"?';
+  document.getElementById('confirmSim').onclick=function(){excluirFornecedor(id);};
+  bar.classList.add('show');
+  clearTimeout(_confirmCallback);
+  _confirmCallback=setTimeout(fecharConfirm,6000);
+}
+function excluirFornecedor(id){
+  fornecedores=fornecedores.filter(function(x){return x.id!==id;});
+  salvarStorage();
+  fecharConfirm();
+  renderFornecedores(fornecedores);
+  showToast('Fornecedor excluído');
+}
+function formatarCep(input){
+  var v=input.value.replace(/\D/g,'');
+  if(v.length>5) v=v.substring(0,5)+'-'+v.substring(5,8);
+  input.value=v;
+}
+function buscarCep(){
+  var cep=document.getElementById('fornCep').value.replace(/\D/g,'');
+  if(cep.length!==8){showToast('CEP inválido — digite 8 números');return;}
+  showToast('Buscando CEP...');
+  // JSONP — funciona em file:// e em qualquer hospedagem
+  var callbackName='viaCepCb_'+Date.now();
+  var script=document.createElement('script');
+  script.src='https://viacep.com.br/ws/'+cep+'/json/?callback='+callbackName;
+  window[callbackName]=function(d){
+    delete window[callbackName];
+    document.head.removeChild(script);
+    if(d.erro){showToast('CEP não encontrado');return;}
+    document.getElementById('fornEndereco').value=d.logradouro||'';
+    document.getElementById('fornBairro').value=d.bairro||'';
+    document.getElementById('fornCidade').value=d.localidade||'';
+    document.getElementById('fornUf').value=d.uf||'';
+    document.getElementById('fornNumero').focus();
+    showToast('Endereço preenchido!');
+  };
+  script.onerror=function(){
+    delete window[callbackName];
+    try{document.head.removeChild(script);}catch(e){}
+    showToast('Erro ao buscar CEP. Verifique sua conexão.');
+  };
+  document.head.appendChild(script);
+}
+function buscarCnpj(){
+  showToast('Digite o CNPJ e consulte no site da Receita Federal');
+}
+// ── END FORNECEDORES ──────────────────────────────────────────
 
 // Init icons on load + auto-login if session exists
 window.addEventListener('load', function(){
