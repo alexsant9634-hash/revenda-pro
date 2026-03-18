@@ -956,6 +956,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <div style="font-size:.7rem;color:var(--text-muted);margin-top:4px;">O progresso aparece na aba Finanças. Coloque 0 para desativar.</div>
         </div>
       </div>
+      <!-- INDICAÇÃO -->
+      <div class="settings-item" onclick="abrirIndicacao()" style="cursor:pointer;background:linear-gradient(135deg,rgba(232,69,122,.08),rgba(199,48,96,.05));border-color:rgba(232,69,122,.2);">
+        <div class="settings-item-left">
+          <div class="settings-icon" style="background:linear-gradient(135deg,var(--rose),var(--rose-dark));">
+            <span style="font-size:1rem;">🎁</span>
+          </div>
+          <div>
+            <div class="settings-label" style="color:var(--rose);">Indique e Ganhe</div>
+            <div class="settings-sub">Indique amigas e ganhe 30 dias grátis</div>
+          </div>
+        </div>
+        <span class="chevron-right"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></span>
+      </div>
+
       <button class="logout-btn" onclick="logout()"><span class="ico" style="width:16px;height:16px"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Sair da conta</button>
     </div>
 
@@ -1346,6 +1360,68 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <button class="btn btn-primary" id="btnSalvarFornecedor" onclick="salvarFornecedor()">Salvar Fornecedor</button>
     <br><br>
     <button class="btn" style="background:var(--bg);color:var(--text-muted)" onclick="fecharModalFornecedor()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL INDICAÇÃO -->
+<div class="modal-overlay" id="modalIndicacao">
+  <div class="modal">
+    <div class="modal-handle"></div>
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <div style="font-size:2.5rem;margin-bottom:.4rem;">🎁</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:.3rem;">Indique e Ganhe</h3>
+      <p style="font-size:.82rem;color:var(--text-muted);line-height:1.5;">Compartilhe seu código com amigas revendedoras. Cada indicação que assinar o plano Pro te dá <strong style="color:var(--rose);">30 dias grátis</strong>.</p>
+    </div>
+
+    <!-- Código -->
+    <div style="background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:1.1rem;text-align:center;margin-bottom:1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;">Seu código de indicação</div>
+      <div id="indicacaoCodigo" style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:white;letter-spacing:.15em;">----</div>
+      <button onclick="copiarCodigo()" style="margin-top:.6rem;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.3rem 1rem;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">📋 Copiar código</button>
+    </div>
+
+    <!-- Como funciona -->
+    <div style="background:var(--bg);border-radius:14px;padding:.9rem;margin-bottom:1rem;">
+      <div style="font-size:.72rem;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;">Como funciona</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:var(--text);">
+          <span style="width:24px;height:24px;background:var(--rose);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem;flex-shrink:0;">1</span>
+          Compartilhe seu código com uma amiga revendedora
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:var(--text);">
+          <span style="width:24px;height:24px;background:var(--rose);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem;flex-shrink:0;">2</span>
+          Ela cria a conta e usa seu código ao assinar o plano Pro
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:var(--text);">
+          <span style="width:24px;height:24px;background:var(--rose);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem;flex-shrink:0;">3</span>
+          Você ganha automaticamente <strong>30 dias grátis</strong> no Pro
+        </div>
+      </div>
+    </div>
+
+    <!-- Contador -->
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;">
+      <div style="flex:1;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:.65rem;text-align:center;">
+        <div id="indicacaoContador" style="font-size:1.4rem;font-weight:900;color:var(--rose);">0</div>
+        <div style="font-size:.68rem;color:var(--text-muted);">Indicações feitas</div>
+      </div>
+      <div style="flex:1;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:.65rem;text-align:center;">
+        <div id="indicacaoDias" style="font-size:1.4rem;font-weight:900;color:var(--green);">0</div>
+        <div style="font-size:.68rem;color:var(--text-muted);">Dias grátis ganhos</div>
+      </div>
+    </div>
+
+    <!-- Aviso -->
+    <div style="background:rgba(52,152,219,.07);border:1px solid rgba(52,152,219,.2);border-radius:10px;padding:.6rem .85rem;font-size:.72rem;color:var(--blue);line-height:1.5;margin-bottom:1rem;">
+      ℹ️ Os dias grátis serão creditados automaticamente quando o plano Pro for lançado. Seu código já está valendo!
+    </div>
+
+    <!-- Botão compartilhar -->
+    <button class="btn btn-primary" style="width:100%;" onclick="compartilharIndicacao()">Compartilhar via WhatsApp</button>
+    <br><br>
+    <button class="btn" style="background:var(--bg);color:var(--text-muted);width:100%;" onclick="closeModal('modalIndicacao')">Fechar</button>
   </div>
 </div>
 
@@ -1823,11 +1899,13 @@ function openModal(id){
   if(id==='modalCliente'){
     fecharModalCliente();
     document.getElementById('modalCliente').classList.add('open');
+    setTimeout(function(){_fornDrag('modalCliente');},50);
     return;
   }
   if(id==='modalProduto'){
     fecharModalProduto();
     document.getElementById(id).classList.add('open');
+    setTimeout(function(){_fornDrag('modalProduto');},50);
     return;
   }
   if(id==='modalPedido'){
@@ -1840,6 +1918,9 @@ function openModal(id){
     document.getElementById('pedQtd').value=1;
     document.getElementById('pedValor').value='';
     document.getElementById('pedPagamento').value='pago';
+    document.getElementById(id).classList.add('open');
+    setTimeout(function(){_fornDrag('modalPedido');},50);
+    return;
   }
   document.getElementById(id).classList.add('open');
 }
@@ -1878,6 +1959,7 @@ function abrirEditarCliente(id){
     document.getElementById('cliTeto').value='';
   }
   document.getElementById('modalCliente').classList.add('open');
+  setTimeout(function(){_fornDrag('modalCliente');},50);
 }
 function confirmarExcluirCliente(id){
   const c=clientes.find(x=>x.id===id);
@@ -2175,6 +2257,7 @@ function abrirEditarPedido(id){
   document.getElementById('pedEntrega').value=p.entrega||'aguardando';
   document.getElementById('tetoAviso').style.display='none';
   document.getElementById('modalPedido').classList.add('open');
+  setTimeout(function(){_fornDrag('modalPedido');},50);
 }
 function fecharModalPedido(){
   document.getElementById('pedEditId').value='';
@@ -2292,6 +2375,7 @@ function abrirEditarProduto(id){
     if(wrap) wrap.style.display='none';
   }
   document.getElementById('modalProduto').classList.add('open');
+  setTimeout(function(){_fornDrag('modalProduto');},50);
 }
 function confirmarExcluirProduto(id){
   const p=produtos.find(x=>x.id===id);
@@ -3489,9 +3573,54 @@ function fecharPwaBanner(){
 // ── END PWA ───────────────────────────────────────────────────
 
 // ── FORNECEDORES ──────────────────────────────────────────────
+function _fornDrag(modalId){
+  var overlay=document.getElementById(modalId);
+  var sheet=overlay?overlay.querySelector('.modal'):null;
+  if(!sheet||sheet._fornDragSet)return;
+  sheet._fornDragSet=true;
+  var sy=0, dragging=false;
+
+  sheet.addEventListener('touchstart',function(e){
+    // só inicia se o scroll do modal está no topo
+    if(sheet.scrollTop>10)return;
+    sy=e.touches[0].clientY;
+    dragging=true;
+    sheet.style.transition='none';
+  },{passive:true});
+
+  sheet.addEventListener('touchmove',function(e){
+    if(!dragging)return;
+    var dy=e.touches[0].clientY-sy;
+    if(dy<=0){dragging=false;sheet.style.transform='';return;}
+    sheet.style.transform='translateY('+dy+'px)';
+  },{passive:true});
+
+  sheet.addEventListener('touchend',function(e){
+    if(!dragging)return;
+    dragging=false;
+    var dy=e.changedTouches[0].clientY-sy;
+    sheet.style.transition='transform .3s cubic-bezier(.4,0,.2,1)';
+    if(dy>100){
+      sheet.style.transform='translateY(110%)';
+      setTimeout(function(){
+        overlay.classList.remove('open');
+        sheet.style.transform='';
+        sheet.style.transition='';
+        sheet._fornDragSet=false;
+      },300);
+    } else {
+      sheet.style.transform='translateY(0)';
+      setTimeout(function(){
+        sheet.style.transform='';
+        sheet.style.transition='';
+      },300);
+    }
+  },{passive:true});
+}
 function abrirFornecedores(){
   renderFornecedores(fornecedores);
   document.getElementById('modalFornecedores').classList.add('open');
+  setTimeout(function(){_fornDrag('modalFornecedores');},50);
 }
 function renderFornecedores(lista){
   const el=document.getElementById('fornecedoresList');
@@ -3540,6 +3669,7 @@ function abrirNovoFornecedor(){
   document.getElementById('fornFormTituloTxt').textContent='Novo Fornecedor';
   document.getElementById('btnSalvarFornecedor').textContent='Salvar Fornecedor';
   document.getElementById('modalFornecedorForm').classList.add('open');
+  setTimeout(function(){_fornDrag('modalFornecedorForm');},50);
 }
 function abrirEditarFornecedor(id){
   const f=fornecedores.find(x=>x.id===id);
@@ -3567,6 +3697,7 @@ function abrirEditarFornecedor(id){
   document.getElementById('fornInstagram').value=f.instagram||'';
   document.getElementById('fornObs').value=f.obs||'';
   document.getElementById('modalFornecedorForm').classList.add('open');
+  setTimeout(function(){_fornDrag('modalFornecedorForm');},50);
 }
 function fecharModalFornecedor(){
   limparFormFornecedor();
@@ -3668,6 +3799,63 @@ function buscarCnpj(){
   showToast('Digite o CNPJ e consulte no site da Receita Federal');
 }
 // ── END FORNECEDORES ──────────────────────────────────────────
+
+// ── INDICAÇÃO ─────────────────────────────────────────────────
+function gerarCodigoIndicacao(email){
+  // gera código único baseado no email — determinístico
+  var str=(email||'user').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var hash=0;
+  for(var i=0;i<str.length;i++) hash=(hash*31+str.charCodeAt(i))&0xFFFFFF;
+  var parte1=str.substring(0,3)||'REV';
+  var parte2=Math.abs(hash).toString(36).toUpperCase().substring(0,4).padStart(4,'0');
+  return parte1+parte2;
+}
+function abrirIndicacao(){
+  var email=userData&&userData.email?userData.email:'';
+  var codigo=gerarCodigoIndicacao(email);
+  document.getElementById('indicacaoCodigo').textContent=codigo;
+  // carregar contador salvo
+  var dados=JSON.parse(localStorage.getItem('rp_indicacao')||'{"indicacoes":0}');
+  document.getElementById('indicacaoContador').textContent=dados.indicacoes||0;
+  document.getElementById('indicacaoDias').textContent=(dados.indicacoes||0)*30;
+  document.getElementById('modalIndicacao').classList.add('open');
+  setTimeout(function(){_fornDrag('modalIndicacao');},50);
+}
+function copiarCodigo(){
+  var codigo=document.getElementById('indicacaoCodigo').textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(codigo).then(function(){
+      showToast('Código copiado!');
+    }).catch(function(){_copiarFallback(codigo);});
+  } else {
+    _copiarFallback(codigo);
+  }
+}
+function _copiarFallback(texto){
+  var el=document.createElement('textarea');
+  el.value=texto;
+  el.style.position='fixed';
+  el.style.opacity='0';
+  document.body.appendChild(el);
+  el.focus(); el.select();
+  try{document.execCommand('copy');showToast('Código copiado!');}
+  catch(e){showToast('Copie o código: '+texto);}
+  document.body.removeChild(el);
+}
+function compartilharIndicacao(){
+  var codigo=document.getElementById('indicacaoCodigo').textContent;
+  var nome=userData&&userData.name?userData.name.split(' ')[0]:'';
+  var msg=
+'🎁 *Convite Especial — Revenda Pro*\n\n'+
+'Oi! '+nome+' te convidou para o *Revenda Pro* — o app que organiza suas vendas, clientes, cobranças e estoque tudo em um lugar!\n\n'+
+'Use o código de indicação para ganhar *30 dias grátis* no plano Pro:\n\n'+
+'*'+codigo+'*\n\n'+
+'Acesse agora:\n'+
+'👉 https://seuusuario.github.io/revenda-pro\n\n'+
+'_Revenda Pro — Gestão inteligente para revendedoras_ 💄';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+// ── END INDICAÇÃO ─────────────────────────────────────────────
 
 // Init icons on load + auto-login if session exists
 window.addEventListener('load', function(){
