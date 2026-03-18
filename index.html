@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Revenda Pro">
-<meta name="theme-color" content="#E8457A">
+<meta name="theme-color" content="#C0355A">
 <meta name="description" content="Gestão inteligente para revendedoras de cosméticos">
 <link rel="manifest" id="manifestLink">
 <link rel="apple-touch-icon" id="appleTouchIcon">
@@ -15,35 +15,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --rose: #E8457A;
-  --rose-dark: #c73060;
-  --rose-light: #fce4ed;
-  --rose-glow: rgba(232,69,122,0.15);
+  /* Paleta principal — Rose premium */
+  --rose: #C0355A;
+  --rose-dark: #962140;
+  --rose-light: #f9e4ec;
+  --rose-glow: rgba(192,53,90,0.15);
+
+  /* Secundária — Uva/Roxo */
+  --violet: #7B2D8B;
+  --violet-light: rgba(123,45,139,0.1);
+
+  /* Destaque — Dourado */
+  --gold: #C9862A;
+  --gold-light: rgba(201,134,42,0.12);
+
+  /* Backgrounds */
   --card-bg: #ffffff;
-  --bg: #f7f0f4;
-  --border: rgba(232,69,122,0.12);
-  --text: #1a0a0f;
-  --text-muted: #7a5060;
-  --nav-bg: rgba(255,255,255,0.95);
+  --bg: #faf4f7;
+  --border: rgba(192,53,90,0.12);
+
+  /* Textos */
+  --text: #18080f;
+  --text-muted: #7a4f62;
+
+  /* Navegação */
+  --nav-bg: rgba(255,255,255,0.96);
   --input-bg: #fff;
-  --shadow: 0 4px 24px rgba(232,69,122,0.08);
-  --shadow-lg: 0 12px 48px rgba(232,69,122,0.15);
-  --green: #2ecc71;
-  --orange: #f39c12;
-  --blue: #3498db;
+
+  /* Sombras */
+  --shadow: 0 4px 24px rgba(192,53,90,0.08);
+  --shadow-lg: 0 12px 48px rgba(192,53,90,0.16);
+
+  /* Status — mantidos para legibilidade */
+  --green: #1e9e57;
+  --orange: #d4820a;
+  --blue: #2471b8;
 }
 [data-theme="dark"] {
-  --card-bg: #1e0d14;
-  --bg: #150910;
-  --border: rgba(232,69,122,0.2);
-  --text: #f5e6ec;
-  --text-muted: #c49aaa;
-  --nav-bg: rgba(30,13,20,0.95);
-  --input-bg: #2a1520;
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
-  --shadow-lg: 0 12px 48px rgba(0,0,0,0.4);
-  --rose-glow: rgba(232,69,122,0.1);
-  --rose-light: rgba(232,69,122,0.18);
+  --card-bg: #1a0a11;
+  --bg: #110609;
+  --border: rgba(192,53,90,0.22);
+  --text: #f7e8ef;
+  --text-muted: #c498ab;
+  --nav-bg: rgba(26,10,17,0.97);
+  --input-bg: #280f1a;
+  --shadow: 0 4px 24px rgba(0,0,0,0.35);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.5);
+  --rose-glow: rgba(192,53,90,0.12);
+  --rose-light: rgba(192,53,90,0.18);
+  --violet-light: rgba(123,45,139,0.15);
+  --gold-light: rgba(201,134,42,0.12);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -55,13 +76,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 /* AUTH */
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
-.auth-screen::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(232,69,122,.12) 0%,transparent 70%);top:-150px;right:-150px;border-radius:50%;animation:float 8s ease-in-out infinite;}
-.auth-screen::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(232,69,122,.08) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:float 10s ease-in-out infinite reverse;}
+.auth-screen::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(192,53,90,.12) 0%,transparent 70%);top:-150px;right:-150px;border-radius:50%;animation:float 8s ease-in-out infinite;}
+.auth-screen::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(192,53,90,.08) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:float 10s ease-in-out infinite reverse;}
 @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-20px) scale(1.05)}}
 .auth-card{background:var(--card-bg);border-radius:28px;padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:var(--shadow-lg);border:1px solid var(--border);position:relative;z-index:2;animation:slideUp .5s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 .auth-logo{text-align:center;margin-bottom:2rem;}
-.logo-mark{width:72px;height:72px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:22px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;box-shadow:0 8px 24px rgba(232,69,122,.35);position:relative;overflow:hidden;}
+.logo-mark{width:72px;height:72px;background:linear-gradient(135deg,var(--rose),#7B2D8B);border-radius:22px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;box-shadow:0 8px 24px rgba(192,53,90,.35);position:relative;overflow:hidden;}
 .logo-mark::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);}
 .logo-mark i{position:relative;z-index:1;color:white;}
 .logo-name{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--text);display:block;letter-spacing:-.5px;}
@@ -75,8 +96,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .form-input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-glow);}
 .form-input::placeholder{color:var(--text-muted);opacity:.5;}
 .btn{width:100%;padding:.9rem;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;}
-.btn-primary{background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;box-shadow:0 4px 16px rgba(232,69,122,.35);margin-top:.5rem;}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,69,122,.45);}
+.btn-primary{background:linear-gradient(135deg,var(--rose),#7B2D8B);color:white;box-shadow:0 4px 16px rgba(192,53,90,.35);margin-top:.5rem;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(123,45,139,.45);}
 .auth-switch{text-align:center;margin-top:1.5rem;font-size:.88rem;color:var(--text-muted);}
 .auth-switch a{color:var(--rose);font-weight:700;cursor:pointer;}
 
@@ -84,7 +105,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .app{display:none;min-height:100vh;}
 .topnav{position:fixed;top:0;left:0;right:0;height:64px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;z-index:100;}
 .nav-logo{display:flex;align-items:center;gap:.6rem;}
-.nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(232,69,122,.3);}
+.nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--rose),#7B2D8B);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(192,53,90,.3);}
 .nav-logo-mark i{color:white;}
 .nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text);}
 .nav-logo-text span{color:var(--rose);}
@@ -98,7 +119,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:.4rem .25rem;border-radius:10px;transition:all .2s;color:var(--text-muted);border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;}
 .nav-item.active{color:var(--rose);}
 .nav-item i{transition:all .2s;}
-.nav-item.active i{filter:drop-shadow(0 2px 4px rgba(232,69,122,.4));}
+.nav-item.active i{filter:drop-shadow(0 2px 4px rgba(192,53,90,.4));}
 .nav-item-label{font-size:.62rem;font-weight:700;letter-spacing:.3px;}
 .main-content{padding-top:64px;padding-bottom:78px;min-height:100vh;}
 .screen{display:none;padding:1.25rem;animation:fadeIn .3s ease;}
@@ -106,7 +127,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* DASHBOARD */
-.dash-hero{background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:24px;padding:1.5rem;margin-bottom:1.25rem;color:white;text-align:center;position:relative;overflow:hidden;}
+.dash-hero{background:linear-gradient(135deg,var(--rose) 0%,#7B2D8B 100%);border-radius:24px;padding:1.5rem;margin-bottom:1.25rem;color:white;text-align:center;position:relative;overflow:hidden;}
 .dash-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%;}
 .dash-hero::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,.06);border-radius:50%;}
 .dash-logo-wrap{width:56px;height:56px;background:rgba(255,255,255,.2);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.75rem;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);position:relative;z-index:1;}
@@ -130,8 +151,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .quick-btn{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:.875rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);}
 .quick-btn:hover{border-color:var(--rose);background:var(--rose-glow);transform:translateY(-2px);}
 .quick-btn:hover i{color:var(--rose);}
-.quick-btn.primary{background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-color:transparent;color:white;grid-column:span 2;justify-content:center;box-shadow:0 4px 16px rgba(232,69,122,.3);font-size:1rem;font-weight:700;padding:1rem;}
-.quick-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,69,122,.45);}
+.quick-btn.primary{background:linear-gradient(135deg,var(--rose),#7B2D8B);border-color:transparent;color:white;grid-column:span 2;justify-content:center;box-shadow:0 4px 16px rgba(192,53,90,.3);font-size:1rem;font-weight:700;padding:1rem;}
+.quick-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(123,45,139,.45);}
 .quick-btn.primary i{color:white;}
 .quick-btn-icon{display:flex;align-items:center;justify-content:center;}
 .quick-btn-icon i{color:var(--rose);}
@@ -141,7 +162,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
 .page-header h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem;}
 .page-header h2 i{color:var(--rose);}
-.fab{position:fixed;bottom:82px;right:1.25rem;width:50px;height:50px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border:none;border-radius:15px;color:white;cursor:pointer;box-shadow:0 6px 20px rgba(232,69,122,.4);display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:50;}
+.fab{position:fixed;bottom:82px;right:1.25rem;width:50px;height:50px;background:linear-gradient(135deg,var(--rose),#7B2D8B);border:none;border-radius:15px;color:white;cursor:pointer;box-shadow:0 6px 20px rgba(192,53,90,.4);display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:50;}
 .fab:hover{transform:translateY(-3px) scale(1.05);}
 .fab i{color:white;}
 
@@ -169,7 +190,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .list-status{font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:2px;}
 .status-pago{background:rgba(46,204,113,.12);color:var(--green);}
 .status-pendente{background:rgba(243,156,18,.12);color:var(--orange);}
-.status-deve{background:rgba(232,69,122,.12);color:var(--rose);}
+.status-deve{background:rgba(192,53,90,.12);color:var(--rose);}
 .status-cancelado{background:rgba(0,0,0,.08);color:var(--text-muted);}
 
 /* STATS ROW */
@@ -193,14 +214,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .product-stock{font-size:.7rem;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:3px;justify-content:flex-end;}
 .product-stock.low{color:var(--rose);font-weight:700;}
 .product-profit{font-size:.7rem;color:var(--green);font-weight:700;display:flex;align-items:center;gap:3px;justify-content:flex-end;}
-.stock-alert-badge{background:rgba(232,69,122,.12);color:var(--rose);font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:3px;}
+.stock-alert-badge{background:rgba(192,53,90,.12);color:var(--rose);font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:3px;}
 .product-actions{display:flex;gap:.4rem;width:100%;padding-left:66px;}
-.btn-prod-edit{display:inline-flex;align-items:center;gap:.3rem;background:var(--rose-light);color:var(--rose);border:1px solid rgba(232,69,122,.2);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
-.btn-prod-edit:hover{background:rgba(232,69,122,.18);}
+.btn-prod-edit{display:inline-flex;align-items:center;gap:.3rem;background:var(--rose-light);color:var(--rose);border:1px solid rgba(192,53,90,.2);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+.btn-prod-edit:hover{background:rgba(192,53,90,.18);}
 .btn-prod-del{display:inline-flex;align-items:center;gap:.3rem;background:var(--bg);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:.28rem .65rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
-.btn-prod-del:hover{background:rgba(232,69,122,.08);color:var(--rose);}
+.btn-prod-del:hover{background:rgba(192,53,90,.08);color:var(--rose);}
 /* STOCK ALERT BANNER */
-.stock-alert-bar{background:rgba(232,69,122,.07);border:1px solid rgba(232,69,122,.2);border-radius:12px;padding:.65rem .9rem;margin-bottom:.625rem;font-size:.78rem;color:var(--rose);line-height:1.5;display:none;}
+.stock-alert-bar{background:rgba(192,53,90,.07);border:1px solid rgba(192,53,90,.2);border-radius:12px;padding:.65rem .9rem;margin-bottom:.625rem;font-size:.78rem;color:var(--rose);line-height:1.5;display:none;}
 .stock-alert-bar.show{display:block;}
 /* IMG UPLOAD */
 .img-upload-zone{display:block;border:2px dashed var(--border);border-radius:12px;padding:.9rem;text-align:center;cursor:pointer;transition:all .2s;}
@@ -223,7 +244,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .cal-day-name{font-size:.62rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
 .cal-day-num{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--text);transition:all .2s;margin:0 auto;position:relative;}
 .cal-day.today .cal-day-num{border:2px solid var(--rose);color:var(--rose);}
-.cal-day.active .cal-day-num{background:var(--rose);color:white;box-shadow:0 4px 12px rgba(232,69,122,.4);}
+.cal-day.active .cal-day-num{background:var(--rose);color:white;box-shadow:0 4px 12px rgba(192,53,90,.4);}
 .cal-day.has-sales .cal-day-num::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--rose);opacity:.7;}
 .cal-day.active.has-sales .cal-day-num::after{background:white;}
 .cal-day-detail{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem;margin-bottom:1rem;animation:fadeIn .2s ease;}
@@ -254,7 +275,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .toggle.on{background:var(--rose);}
 .toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2);}
 .toggle.on::after{transform:translateX(20px);}
-.logout-btn{width:100%;padding:.9rem;border:1.5px solid rgba(232,69,122,.3);border-radius:12px;background:none;color:var(--rose);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.logout-btn{width:100%;padding:.9rem;border:1.5px solid rgba(192,53,90,.3);border-radius:12px;background:none;color:var(--rose);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
 .logout-btn:hover{background:var(--rose);color:white;border-color:transparent;}
 .logout-btn i{color:inherit;}
 
@@ -289,10 +310,73 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .notif-item{border-radius:14px;padding:.75rem 1rem;display:flex;align-items:flex-start;gap:.75rem;box-shadow:var(--shadow-lg);animation:slideDown .25s ease;position:relative;}
 .notif-item.notif-pending{background:#fff8f0;border:1px solid rgba(243,156,18,.3);}
 .notif-item.notif-paid{background:#f0fbf5;border:1px solid rgba(46,204,113,.3);}
-.notif-item.notif-update{background:var(--rose-light);border:1px solid rgba(232,69,122,.2);}
+.notif-item.notif-update{background:var(--rose-light);border:1px solid rgba(192,53,90,.2);}
 [data-theme="dark"] .notif-item.notif-pending{background:#2a1e0a;border-color:rgba(243,156,18,.25);}
 [data-theme="dark"] .notif-item.notif-paid{background:#0a2016;border-color:rgba(46,204,113,.25);}
-[data-theme="dark"] .notif-item.notif-update{background:#2a0d18;border-color:rgba(232,69,122,.25);}
+[data-theme="dark"] .notif-item.notif-update{background:#2a0d18;border-color:rgba(192,53,90,.25);}
+
+/* ── CONTRASTE MODO ESCURO — textos sobre fundos rose/violet ── */
+
+/* Tom rosa claro para textos rose sobre fundo escuro */
+[data-theme="dark"] .logo-name span,
+[data-theme="dark"] .nav-logo-text span,
+[data-theme="dark"] .auth-switch a,
+[data-theme="dark"] .nav-item.active,
+[data-theme="dark"] .card-icon,
+[data-theme="dark"] .finance-card-icon,
+[data-theme="dark"] .section-title i,
+[data-theme="dark"] .quick-btn-icon i,
+[data-theme="dark"] .page-header h2 i,
+[data-theme="dark"] .modal-title i,
+[data-theme="dark"] .product-price,
+[data-theme="dark"] .product-stock.low,
+[data-theme="dark"] .list-value,
+[data-theme="dark"] .toast i,
+[data-theme="dark"] .rank-val,
+[data-theme="dark"] .desp-val,
+[data-theme="dark"] .hist-item-val,
+[data-theme="dark"] .repos-estoque,
+[data-theme="dark"] .inad-val,
+[data-theme="dark"] .meta-pct,
+[data-theme="dark"] .btn-prod-edit,
+[data-theme="dark"] .freq-check,
+[data-theme="dark"] .logout-btn { color: #f0a0bb; }
+
+/* Bordas e backgrounds dos elementos acima */
+[data-theme="dark"] .btn-prod-edit { border-color: rgba(240,160,187,.25); background: rgba(240,160,187,.08); }
+[data-theme="dark"] .logout-btn { border-color: rgba(240,160,187,.3); }
+[data-theme="dark"] .logout-btn:hover { background: #C0355A; color: #fff; border-color: transparent; }
+
+/* Settings icon stroke */
+[data-theme="dark"] .settings-icon svg { stroke: #f0a0bb; }
+
+/* Teto badges */
+[data-theme="dark"] .teto-badge.bloqueado { background: rgba(192,53,90,.25); color: #f0a0bb; }
+[data-theme="dark"] .teto-badge.alerta { background: rgba(201,134,42,.2); color: #f5c47a; }
+[data-theme="dark"] .teto-badge.ok { background: rgba(30,158,87,.18); color: #5ce49a; }
+
+/* A receber finance card */
+[data-theme="dark"] #finReceber { color: #f5c47a; }
+
+/* Textos sobre gradiente rose+violet — sempre branco */
+[data-theme="dark"] .dash-hero,
+[data-theme="dark"] .dash-hero h2,
+[data-theme="dark"] .dash-hero p { color: #ffffff; }
+
+/* Venda rápida total */
+[data-theme="dark"] #prTotalVal { color: #f0a0bb; }
+
+/* Histórico gasto */
+[data-theme="dark"] #histGasto { color: #f0a0bb; }
+
+/* Indicação contador */
+[data-theme="dark"] #indicacaoContador { color: #f0a0bb; }
+
+/* Labels de seção uppercase rose (inline styles) */
+[data-theme="dark"] [style*="color:var(--rose)"],
+[data-theme="dark"] [style*="color: var(--rose)"] { color: #f0a0bb !important; }
+
+/* ── END CONTRASTE MODO ESCURO ─────────────────────────────── */
 .notif-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .notif-icon.pending{background:rgba(243,156,18,.15);}
 .notif-icon.paid{background:rgba(46,204,113,.15);}
@@ -334,8 +418,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .desp-val{font-size:.9rem;font-weight:800;color:var(--rose);flex-shrink:0;}
 .desp-del{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;margin-left:.5rem;font-size:1rem;line-height:1;}
 /* ANIVERSARIO */
-.aniv-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(232,69,122,.1);color:var(--rose);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
-.aniv-alert{background:rgba(232,69,122,.07);border:1px solid rgba(232,69,122,.2);border-radius:12px;padding:.65rem .9rem;margin-bottom:.625rem;font-size:.8rem;color:var(--rose);display:none;}
+.aniv-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(192,53,90,.1);color:var(--rose);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
+.aniv-alert{background:rgba(192,53,90,.07);border:1px solid rgba(192,53,90,.2);border-radius:12px;padding:.65rem .9rem;margin-bottom:.625rem;font-size:.8rem;color:var(--rose);display:none;}
 .aniv-alert.show{display:block;}
 .hist-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
 .hist-avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -359,9 +443,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* DESPESAS */
 .despesa-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border);}
 .despesa-item:last-child{border-bottom:none;}
-.despesa-cat{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;background:rgba(232,69,122,.1);color:var(--rose);}
+.despesa-cat{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;background:rgba(192,53,90,.1);color:var(--rose);}
 .despesa-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.8rem;padding:2px 6px;border-radius:6px;}
-.despesa-del:hover{color:var(--rose);background:rgba(232,69,122,.08);}
+.despesa-del:hover{color:var(--rose);background:rgba(192,53,90,.08);}
 /* META */
 .meta-wrap{background:var(--card-bg);border-radius:16px;padding:1rem;border:1px solid var(--border);margin-bottom:1rem;}
 .meta-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;}
@@ -383,16 +467,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .rank-sub{font-size:.7rem;color:var(--text-muted);margin-top:1px;}
 .rank-val{font-size:.88rem;font-weight:700;color:var(--rose);text-align:right;}
 /* ANIVERSARIO */
-.aniv-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(232,69,122,.1);color:var(--rose);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
+.aniv-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(192,53,90,.1);color:var(--rose);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
 
 /* PEDIDO ACTIONS */
 .pedido-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;padding-left:46px;width:100%;}
 .btn-pagar{display:inline-flex;align-items:center;gap:.3rem;background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.3);border-radius:8px;padding:.32rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
 .btn-pagar:hover{background:rgba(46,204,113,.22);}
-.btn-editar{display:inline-flex;align-items:center;gap:.3rem;background:var(--rose-light);color:var(--rose);border:1px solid rgba(232,69,122,.2);border-radius:8px;padding:.32rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
-.btn-editar:hover{background:rgba(232,69,122,.18);}
+.btn-editar{display:inline-flex;align-items:center;gap:.3rem;background:var(--rose-light);color:var(--rose);border:1px solid rgba(192,53,90,.2);border-radius:8px;padding:.32rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
+.btn-editar:hover{background:rgba(192,53,90,.18);}
 .btn-excluir{display:inline-flex;align-items:center;gap:.3rem;background:var(--bg);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:.32rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
-.btn-excluir:hover{background:rgba(232,69,122,.08);color:var(--rose);border-color:rgba(232,69,122,.2);}
+.btn-excluir:hover{background:rgba(192,53,90,.08);color:var(--rose);border-color:rgba(192,53,90,.2);}
 /* CONFIRM DELETE TOAST */
 .confirm-bar{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--card-bg);padding:.7rem 1.1rem;border-radius:14px;font-size:.82rem;font-weight:600;z-index:300;display:none;align-items:center;gap:.75rem;box-shadow:var(--shadow-lg);white-space:nowrap;}
 .confirm-bar.show{display:flex;}
@@ -406,10 +490,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .teto-bar-fill.warn{background:var(--orange);}
 .teto-bar-fill.danger{background:var(--rose);}
 .teto-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:.65rem;font-weight:700;}
-.teto-badge.bloqueado{background:rgba(232,69,122,.15);color:var(--rose);}
+.teto-badge.bloqueado{background:rgba(192,53,90,.15);color:var(--rose);}
 .teto-badge.alerta{background:rgba(243,156,18,.15);color:var(--orange);}
 .teto-badge.ok{background:rgba(46,204,113,.12);color:var(--green);}
-.teto-aviso{background:rgba(232,69,122,.08);border:1px solid rgba(232,69,122,.25);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;color:var(--rose);margin-bottom:.75rem;display:none;}
+.teto-aviso{background:rgba(192,53,90,.08);border:1px solid rgba(192,53,90,.25);border-radius:10px;padding:.6rem .85rem;font-size:.78rem;color:var(--rose);margin-bottom:.75rem;display:none;}
 .teto-aviso.show{display:block;}
 .freq-option{cursor:pointer;display:block;}
 .freq-btn{display:flex;align-items:center;gap:.75rem;padding:.65rem .85rem;border-radius:12px;border:2px solid var(--border);background:var(--bg);transition:all .18s;}
@@ -456,7 +540,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .repos-estoque{font-size:.72rem;color:var(--rose);font-weight:700;}
 
 /* INADIMPLENTES */
-.inad-item{display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:var(--card-bg);border:1px solid rgba(232,69,122,.2);border-radius:12px;margin-bottom:.4rem;}
+.inad-item{display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:var(--card-bg);border:1px solid rgba(192,53,90,.2);border-radius:12px;margin-bottom:.4rem;}
 .inad-nome{font-size:.83rem;font-weight:700;color:var(--text);}
 .inad-val{font-size:.82rem;font-weight:900;color:var(--rose);}
 .inad-dias{font-size:.68rem;color:var(--text-muted);margin-top:1px;}
@@ -469,7 +553,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .rel-val{font-weight:700;color:var(--text);}
 
 /* PWA INSTALL BANNER */
-.pwa-banner{position:fixed;bottom:80px;left:1rem;right:1rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:.9rem 1.1rem;display:none;align-items:center;gap:.75rem;z-index:400;box-shadow:0 8px 32px rgba(232,69,122,.4);animation:slideUp .4s ease;}
+.pwa-banner{position:fixed;bottom:80px;left:1rem;right:1rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:.9rem 1.1rem;display:none;align-items:center;gap:.75rem;z-index:400;box-shadow:0 8px 32px rgba(192,53,90,.4);animation:slideUp .4s ease;}
 .pwa-banner.show{display:flex;}
 .pwa-banner-icon{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;}
 .pwa-banner-text{flex:1;}
@@ -521,7 +605,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="auth-screen" id="loginScreen">
   <div class="auth-card">
     <div class="auth-logo">
-      <div class="logo-mark"><span class="ico" style="width:36px;height:36px"><svg width="36" height="36" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#E8457A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#E8457A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
+      <div class="logo-mark"><span class="ico" style="width:36px;height:36px"><svg width="36" height="36" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#C0355A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#C0355A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
       <span class="logo-name">Revenda <span>Pro</span></span>
       <span class="logo-tagline">Gestão inteligente para revendedoras</span>
     </div>
@@ -538,7 +622,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="auth-screen" id="registerScreen" style="display:none">
   <div class="auth-card">
     <div class="auth-logo">
-      <div class="logo-mark"><span class="ico" style="width:36px;height:36px"><svg width="36" height="36" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#E8457A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#E8457A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
+      <div class="logo-mark"><span class="ico" style="width:36px;height:36px"><svg width="36" height="36" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#C0355A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#C0355A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
       <span class="logo-name">Revenda <span>Pro</span></span>
     </div>
     <h2 class="auth-title">Criar sua conta</h2>
@@ -556,7 +640,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
   <nav class="topnav">
     <div class="nav-logo">
-      <div class="nav-logo-mark"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#E8457A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#E8457A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
+      <div class="nav-logo-mark"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#C0355A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#C0355A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
       <span class="nav-logo-text">Revenda <span>Pro</span></span>
     </div>
     <div class="nav-actions">
@@ -572,7 +656,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <!-- DASHBOARD -->
     <div class="screen active" id="screenDash">
       <div class="dash-hero">
-        <div class="dash-logo-wrap"><span class="ico" style="width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#E8457A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#E8457A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
+        <div class="dash-logo-wrap"><span class="ico" style="width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/><rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/><rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/><rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/><rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#C0355A"/><path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#C0355A" stroke-width="2.8" stroke-linecap="round" fill="none"/></svg></span></div>
         <h2>Olá, <span id="dashName">Maria</span>!</h2>
         <p>Aqui está o resumo das suas vendas</p>
       </div>
@@ -1688,7 +1772,7 @@ function abrirNotificacoes(){
         iconSvg=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
       } else {
         cls='notif-update'; iconCls='update';
-        iconSvg=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8457A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+        iconSvg=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C0355A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
       }
       return `<div class="notif-item ${cls}">
         <div class="notif-icon ${iconCls}">${iconSvg}</div>
