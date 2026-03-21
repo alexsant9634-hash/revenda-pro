@@ -711,7 +711,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .rel-val{font-weight:700;color:var(--text);}
 
 /* PWA INSTALL BANNER */
-.pwa-banner{position:fixed;bottom:80px;left:1rem;right:1rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:.9rem 1.1rem;display:none;align-items:center;gap:.75rem;z-index:400;box-shadow:0 8px 32px rgba(26,158,92,.4);animation:slideUp .4s ease;}
+.pwa-banner{position:fixed;bottom:80px;left:1rem;right:1rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:.9rem 1.1rem;display:none;align-items:center;gap:.75rem;z-index:400;box-shadow:0 8px 32px rgba(26,158,92,.35);animation:slideUp .4s ease;}
 .pwa-banner.show{display:flex;}
 .pwa-banner-icon{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;}
 .pwa-banner-text{flex:1;}
@@ -3736,111 +3736,25 @@ function compartilharRelatorio(){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 // ── PWA ───────────────────────────────────────────────────────
-// Registra o service worker real (arquivo sw.js na raiz)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('./sw.js')
-      .then(function(reg) {
-        console.log('[PWA] Service Worker registrado:', reg.scope);
-      })
-      .catch(function(err) {
-        console.warn('[PWA] Falha ao registrar SW:', err);
-      });
-  });
-}
-// ── END PWA ───────────────────────────────────────────────────
-
-function _gerarIconePWA(size){
-  var canvas = document.createElement('canvas');
-  canvas.width = size; canvas.height = size;
-  var ctx = canvas.getContext('2d');
-  // Background gradient
-  var grad = ctx.createLinearGradient(0,0,size,size);
-  grad.addColorStop(0,'#E8457A');
-  grad.addColorStop(1,'#c73060');
-  ctx.fillStyle = grad;
-  var r = size * 0.22;
-  ctx.beginPath();
-  ctx.moveTo(r,0); ctx.lineTo(size-r,0);
-  ctx.arcTo(size,0,size,r,r);
-  ctx.lineTo(size,size-r);
-  ctx.arcTo(size,size,size-r,size,r);
-  ctx.lineTo(r,size);
-  ctx.arcTo(0,size,0,size-r,r);
-  ctx.lineTo(0,r);
-  ctx.arcTo(0,0,r,0,r);
-  ctx.closePath();
-  ctx.fill();
-  // Perfume bottle shape
-  var s = size/64;
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  // Cap
-  ctx.fillRect(21*s,6*s,22*s,7*s);
-  // Neck
-  ctx.fillRect(27*s,13*s,10*s,5*s);
-  // Body
-  ctx.beginPath();
-  ctx.roundRect(8*s,18*s,48*s,28*s,18*s);
-  ctx.fill();
-  // Base
-  ctx.fillRect(27*s,46*s,10*s,4*s);
-  // Dollar sign
-  ctx.fillStyle = '#E8457A';
-  ctx.fillRect(30*s,21*s,4*s,22*s);
-  ctx.strokeStyle = '#E8457A';
-  ctx.lineWidth = 3*s;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(38*s,25*s);
-  ctx.bezierCurveTo(38*s,22*s,35*s,21*s,32*s,21*s);
-  ctx.bezierCurveTo(29*s,21*s,26*s,22.5*s,26*s,25*s);
-  ctx.bezierCurveTo(26*s,27.5*s,29*s,28.5*s,32*s,29*s);
-  ctx.bezierCurveTo(35*s,29.5*s,38*s,30.5*s,38*s,33*s);
-  ctx.bezierCurveTo(38*s,35.5*s,35*s,37*s,32*s,37*s);
-  ctx.bezierCurveTo(29*s,37*s,26*s,35.5*s,26*s,33.5*s);
-  ctx.stroke();
-  return canvas.toDataURL('image/png');
-}
-
-// Install prompt handler
-var _pwaPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e){
-  e.preventDefault();
-  _pwaPrompt = e;
-  // Show banner only if not already installed and not dismissed before
-  if(!localStorage.getItem('pwa_dismissed')){
-    setTimeout(function(){
-      var banner = document.getElementById('pwaBanner');
-      if(banner) banner.classList.add('show');
-    }, 3000);
-  }
-  document.getElementById('pwaBannerBtn').addEventListener('click', function(){
-    instalarPWA();
-  });
-});
-
-window.addEventListener('appinstalled', function(){
-  fecharPwaBanner();
-  showToast('App instalado com sucesso!');
-  _pwaPrompt = null;
-});
-
-function instalarPWA(){
-  if(_pwaPrompt){
-    _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(function(r){
-      if(r.outcome === 'accepted'){
-        fecharPwaBanner();
-      }
-      _pwaPrompt = null;
+// Service Worker registrado via arquivo externo sw.js
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      console.log('[SW] Registrado:', reg.scope);
+      reg.onupdatefound = function(){
+        var sw = reg.installing;
+        if(sw){
+          sw.onstatechange = function(){
+            if(sw.state==='installed' && navigator.serviceWorker.controller){
+              showToast('Nova versão disponível! Atualize a página.');
+            }
+          };
+        }
+      };
+    }).catch(function(err){
+      console.log('[SW] Erro:', err);
     });
-  }
-}
-
-function fecharPwaBanner(){
-  var banner = document.getElementById('pwaBanner');
-  if(banner) banner.classList.remove('show');
-  localStorage.setItem('pwa_dismissed','1');
+  });
 }
 // ── END PWA ───────────────────────────────────────────────────
 
