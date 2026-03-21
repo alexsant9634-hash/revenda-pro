@@ -2515,7 +2515,16 @@ function salvarCliente(){
     if(idx===-1){showToast('Cliente não encontrada');return;}
     clientes[idx]={...clientes[idx],nome,whats,status,obs,aniv,teto:tetoVal};
     salvarStorage();
-    if(clientes[idx]._supa_id) _supaUpdate('clientes',clientes[idx]._supa_id,_mapCliente(clientes[idx]));
+    // upsert — garante que teto vai para o banco mesmo sem _supa_id
+    var supa=getSupa(); var uid=_uid();
+    if(supa&&uid){
+      if(clientes[idx]._supa_id){
+        _supaUpdate('clientes',clientes[idx]._supa_id,_mapCliente(clientes[idx]));
+      } else {
+        // sem _supa_id — busca pelo nome e user_id e atualiza
+        supa.from('clientes').update(_mapCliente(clientes[idx])).eq('user_id',uid).eq('nome',nome).then(function(){});
+      }
+    }
     fecharModalCliente();
     renderClientes('all');
     atualizarDashboard();
@@ -2526,7 +2535,11 @@ function salvarCliente(){
   clientes.push(novaCliente);
   salvarStorage();
   _supaInsert('clientes',_mapCliente(novaCliente)).then(function(row){
-    if(row){novaCliente._supa_id=row.id;salvarStorage();}
+    if(row){
+      novaCliente._supa_id=row.id;
+      novaCliente.id=row.id; // usa id do Supabase
+      salvarStorage();
+    }
   });
   fecharModalCliente();
   renderClientes('all');
@@ -2738,8 +2751,13 @@ function salvarPedido(){
 }
 // ── PEDIDO: MARCAR PAGO, EDITAR, EXCLUIR ──────────────────────
 function recalcularDividas(){
-  clientes.forEach(c=>{
-    c.divida=pedidos.filter(p=>p.cliId===c.id&&p.pagamento==='pendente').reduce((s,p)=>s+p.valor,0);
+  clientes.forEach(function(c){
+    var novaDivida=pedidos.filter(function(p){return p.cliId===c.id&&p.pagamento==='pendente';}).reduce(function(s,p){return s+p.valor;},0);
+    if(novaDivida!==c.divida){
+      c.divida=novaDivida;
+      // sync divida no Supabase
+      if(c._supa_id) _supaUpdate('clientes',c._supa_id,{divida:novaDivida});
+    }
   });
 }
 function marcarPago(id){
