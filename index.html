@@ -1767,8 +1767,14 @@ function register(){
 function logout(){
   var supa = getSupa();
   if(supa) supa.auth.signOut();
-  // Limpa todos os dados locais
+  // Preserva perfil e chave Pix — são dados do dispositivo
+  var perfilSalvo = localStorage.getItem('rp_perfil');
+  var configSalvo = localStorage.getItem('rp_config');
+  // Limpa dados da sessão
   localStorage.clear();
+  // Restaura perfil e pix
+  if(perfilSalvo) localStorage.setItem('rp_perfil', perfilSalvo);
+  if(configSalvo) localStorage.setItem('rp_config', configSalvo);
   userData = {name:'', email:''};
   clientes = []; pedidos = []; produtos = [];
   despesas = []; fornecedores = []; metaMensal = 0;
@@ -2684,22 +2690,20 @@ function salvarPedido(){
     }
   }
 
-  // TETO: bloquear QUALQUER novo pedido se cliente atingiu o teto
-  // (exceto edição, cancelamento e pagamentos que quitam a dívida)
-  if(!editId && pagamento!=='cancelado' && cli && cli.teto>0){
+  // TETO: bloquear apenas pedidos FIADOS quando cliente atingiu o teto
+  if(!editId && pagamento==='pendente' && cli && cli.teto>0){
     const divAtual=cli.divida||0;
-    // se já está no teto ou acima — bloqueia qualquer nova compra
+    const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+    // se já está no teto ou acima — bloqueia fiado
     if(divAtual>=cli.teto){
-      showToast(`🚫 ${cli.nome} está bloqueada! Teto de R$ ${cli.teto.toFixed(2).replace('.',',')} atingido. Quite a dívida para liberar.`);
+      showToast('🚫 '+cli.nome+' chegou no limite do teto estabelecido ('+fmt(cli.teto)+'). Quite a dívida para liberar novas compras fiadas.');
       return;
     }
-    // se o novo pedido pendente ultrapassaria o teto
-    if(pagamento==='pendente'){
-      const novaDiv=divAtual+valor;
-      if(novaDiv>cli.teto){
-        showToast(`🚫 Bloqueado! Esse pedido ultrapassaria o teto de R$ ${cli.teto.toFixed(2).replace('.',',')}. Disponível: R$ ${(cli.teto-divAtual).toFixed(2).replace('.',',')}`);
-        return;
-      }
+    // se o novo pedido fiado ultrapassaria o teto
+    const novaDiv=divAtual+valor;
+    if(novaDiv>cli.teto){
+      showToast('🚫 Este pedido ultrapassaria o teto de '+fmt(cli.teto)+'. Disponível para fiado: '+fmt(cli.teto-divAtual));
+      return;
     }
   }
 
@@ -3736,19 +3740,18 @@ function confirmarPedidoRapido(){
     showToast(`Estoque insuficiente! Disponível: ${_prProd.estoque} un.`);
     return;
   }
-  // TETO: bloquear se cliente atingiu o limite
-  if(_prCli.teto>0){
+  // TETO: bloquear apenas fiado quando cliente atingiu o limite
+  if(_prPagto==='pendente' && _prCli.teto>0){
     const divAtual=_prCli.divida||0;
+    const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
     if(divAtual>=_prCli.teto){
-      showToast(`🚫 ${_prCli.nome} está bloqueada! Teto de R$ ${_prCli.teto.toFixed(2).replace('.',',')} atingido.`);
+      showToast('🚫 '+_prCli.nome+' chegou no limite do teto estabelecido ('+fmt(_prCli.teto)+'). Quite a dívida para liberar novas compras fiadas.');
       return;
     }
-    if(_prPagto==='pendente'){
-      const novaDiv=divAtual+(_prProd.preco*_prQtd);
-      if(novaDiv>_prCli.teto){
-        showToast(`🚫 Pedido ultrapassaria o teto! Disponível: R$ ${(_prCli.teto-divAtual).toFixed(2).replace('.',',')}`);
-        return;
-      }
+    const novaDiv=divAtual+(_prProd.preco*_prQtd);
+    if(novaDiv>_prCli.teto){
+      showToast('🚫 Pedido ultrapassaria o teto de '+fmt(_prCli.teto)+'. Disponível: '+fmt(_prCli.teto-divAtual));
+      return;
     }
   }
   const valor=_prProd.preco*_prQtd;
