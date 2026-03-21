@@ -1853,6 +1853,17 @@ function carregarDadosSupabase(){
       var cfg = r[5].data;
       metaMensal = parseFloat(cfg.meta_mensal)||0;
       darkMode   = cfg.dark_mode||false;
+      // salva pix no rp_config para getPerfil encontrar
+      if(cfg.chave_pix){
+        localStorage.setItem('rp_config',JSON.stringify({chave_pix:cfg.chave_pix,tipo_pix:cfg.tipo_pix||''}));
+        // atualiza também no rp_perfil se existir
+        try{
+          var pfLocal=JSON.parse(localStorage.getItem('rp_perfil')||'{}');
+          pfLocal.pixChave=cfg.chave_pix;
+          pfLocal.pixTipo=cfg.tipo_pix||'';
+          localStorage.setItem('rp_perfil',JSON.stringify(pfLocal));
+        }catch(e){}
+      }
     }
 
     salvarStorage();
@@ -2377,6 +2388,18 @@ function salvarPerfil(){
   if(!p.nome){showToast('Informe seu nome completo');return;}
   if(pixTipo && !pixChave){showToast('Informe a chave Pix ou limpe o tipo');return;}
   localStorage.setItem('rp_perfil',JSON.stringify(p));
+  // salva pix também em rp_config para getPerfil encontrar
+  localStorage.setItem('rp_config',JSON.stringify({chave_pix:pixChave,tipo_pix:pixTipo}));
+  // sync Supabase
+  var supa=getSupa(); var uid=_uid();
+  if(supa&&uid){
+    supa.from('configuracoes').update({
+      chave_pix:pixChave,
+      tipo_pix:pixTipo
+    }).eq('user_id',uid).then(function(){});
+    // também atualiza nome no usuario
+    if(p.nome) supa.from('usuarios').update({nome:p.nome}).eq('id',uid).then(function(){});
+  }
   atualizarPerfilUI(p);
   showToast(pixChave ? '✅ Perfil e chave Pix salvos!' : 'Perfil salvo!');
 }
@@ -3102,7 +3125,21 @@ function atualizarDashboard(){
     </div>`).join('');
 
 }
-function getPerfil(){ try{ return JSON.parse(localStorage.getItem('rp_perfil')||'{}'); }catch(e){ return {}; } }
+function getPerfil(){
+  try{
+    var local=JSON.parse(localStorage.getItem('rp_perfil')||'{}');
+    // Complementa com dados do userData se não tiver no perfil local
+    if(!local.nome && userData && userData.name) local.nome=userData.name;
+    // Lê chave pix do localStorage de configurações sincronizadas
+    if(!local.pixChave){
+      try{
+        var cfg=JSON.parse(localStorage.getItem('rp_config')||'{}');
+        if(cfg.chave_pix){ local.pixChave=cfg.chave_pix; local.pixTipo=cfg.tipo_pix||'pix'; }
+      }catch(e){}
+    }
+    return local;
+  }catch(e){ return {}; }
+}
 function pixMsg(perfil){
   if(!perfil.pixChave) return '';
   const tipoLabel={cpf:'CPF',telefone:'Telefone',email:'E-mail',aleatoria:'Aleatória'}[perfil.pixTipo]||'Pix';
