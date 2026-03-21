@@ -2672,7 +2672,6 @@ function salvarPedido(){
     const idx=pedidos.findIndex(x=>x.id===Number(editId));
     if(idx===-1){showToast('Pedido não encontrado');return;}
     const old=pedidos[idx];
-    // restore stock for old product if changed
     if(old.prodId&&old.prodId!==Number(prodId)){
       const oldProd=produtos.find(p=>p.id===old.prodId);
       if(oldProd&&old.pagamento!=='cancelado')oldProd.estoque+=old.qtd;
@@ -2681,6 +2680,8 @@ function salvarPedido(){
     if(prod&&pagamento!=='cancelado')prod.estoque=Math.max(0,prod.estoque-qtd);
     recalcularDividas();
     salvarStorage();
+    if(pedidos[idx]._supa_id) _supaUpdate('pedidos',pedidos[idx]._supa_id,_mapPedido(pedidos[idx]));
+    if(prod&&prod._supa_id) _supaUpdate('produtos',prod._supa_id,_mapProduto(prod));
     fecharModalPedido();
     renderPedidos();renderClientes('all');renderFinancas();atualizarDashboard();
     showToast('Pedido atualizado!');
@@ -3696,12 +3697,18 @@ function confirmarPedidoRapido(){
     }
   }
   const valor=_prProd.preco*_prQtd;
-  pedidos.push({id:Date.now(),cliId:_prCli.id,prodId:_prProd.id,valor,pagamento:_prPagto,qtd:_prQtd,
-    data:new Date().toLocaleDateString('pt-BR'),cliente:_prCli.nome,produto:_prProd.nome,entrega:'aguardando'});
+  var novoPedidoRapido={id:Date.now(),cliId:_prCli.id,prodId:_prProd.id,valor,pagamento:_prPagto,qtd:_prQtd,
+    data:new Date().toLocaleDateString('pt-BR'),cliente:_prCli.nome,produto:_prProd.nome,entrega:'aguardando'};
+  pedidos.push(novoPedidoRapido);
   recalcularDividas();
   if(_prProd)_prProd.estoque=Math.max(0,_prProd.estoque-_prQtd);
   salvarStorage();
-  dispararNotifPedido(pedidos[pedidos.length-1],_prCli);
+  // sync Supabase
+  _supaInsert('pedidos',_mapPedido(novoPedidoRapido)).then(function(row){
+    if(row){novoPedidoRapido._supa_id=row.id;salvarStorage();}
+  });
+  if(_prProd&&_prProd._supa_id) _supaUpdate('produtos',_prProd._supa_id,_mapProduto(_prProd));
+  dispararNotifPedido(novoPedidoRapido,_prCli);
   document.getElementById('prapidoOverlay').classList.remove('open');
   renderPedidos();renderClientes('all');atualizarDashboard();renderCatalogo();
   tocarSomVenda();
