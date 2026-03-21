@@ -3222,16 +3222,46 @@ function cobrarWhats(nome,whats,divida){
   const perfil=getPerfil();
   const num=whats.replace(/\D/g,'');
   const primeiroNome=nome.split(' ')[0];
-  const valor=divida.toFixed(2).replace('.',',');
+  const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+
+  // Busca cliente e pedidos pendentes dela
+  const cli=clientes.find(c=>c.nome===nome);
+  const pendentes=cli ? pedidos.filter(p=>p.cliId===cli.id&&p.pagamento==='pendente') : [];
+
+  // Monta lista de produtos
+  var listaProdutos='';
+  if(pendentes.length>0){
+    listaProdutos='\n\nSegue o detalhamento:\n';
+    pendentes.forEach(function(p,i){
+      listaProdutos+= '\n'+(i+1)+'. *'+p.produto+'*';
+      if(p.qtd>1) listaProdutos+=' ('+p.qtd+'x)';
+      listaProdutos+=' — '+fmt(p.valor);
+      if(p.data) listaProdutos+=' · '+p.data;
+    });
+    listaProdutos+='\n\n*Total em aberto: '+fmt(divida)+'*';
+  } else {
+    listaProdutos='\n\nValor em aberto: *'+fmt(divida)+'*';
+  }
+
+  // Adapta a saudação para 1 ou mais produtos
+  var intro='';
+  if(pendentes.length===1){
+    intro='Passando para lembrar que o pedido de *'+pendentes[0].produto+'* ainda está em aberto por aqui. 😊';
+  } else if(pendentes.length>1){
+    intro='Passando para lembrar que você tem *'+pendentes.length+' pedidos* ainda em aberto por aqui. 😊';
+  } else {
+    intro='Passando para avisar que ainda consta um valor em aberto por aqui. 😊';
+  }
+
   const msg=
-`Oi, ${primeiroNome}! Tudo bem? :)
+'Oi, '+primeiroNome+'! Tudo bem? :)\n\n'
++intro
++listaProdutos
++'\n\nQuando tiver um momento, pode me avisar para a gente combinar o pagamento? Sem pressa, tá bem?'
++pixMsg(perfil)
++'\n\nObrigada! Qualquer dúvida estou à disposição. 🙏';
 
-Passando para avisar que ainda consta um valor de *R$ ${valor}* em aberto por aqui.
-
-Quando tiver um momento, pode me avisar para a gente combinar o pagamento? Sem pressa, ta bem?`
-  + pixMsg(perfil)
-  + `\n\nObrigada! Qualquer duvida estou a disposicao.`;
-  window.open(`https://wa.me/55${num}?text=${encodeURIComponent(msg)}`,'_blank');
+  window.open('https://wa.me/55'+num+'?text='+encodeURIComponent(msg),'_blank');
 }
 function buildCalendar(){
   const strip=document.getElementById('calendarStrip');
