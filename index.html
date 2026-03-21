@@ -847,6 +847,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <div class="card-icon"><span class="ico" style="width:22px;height:22px"><svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span></div>
           <div class="card-value" id="cardVendas">R$ 0</div>
           <div class="card-label">Vendas do mês</div>
+          <div id="cardPendentesInfo" style="font-size:.65rem;color:var(--orange);margin-top:.25rem;font-weight:600;display:none;">⏳ <span id="cardPendentesQtd">0</span> pendente(s) · <span id="cardPendentesVal">R$ 0</span></div>
         </div>
         <div class="summary-card" onclick="showScreen('screenFinancas',null)">
           <div class="card-icon" style="color:var(--green)"><span class="ico" style="width:22px;height:22px"><svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></span></div>
@@ -3119,22 +3120,47 @@ function renderFinancas(){
     </div>`).join('');
 }
 function atualizarDashboard(){
-  const totalVendas=pedidos.filter(p=>p.pagamento!=='cancelado').reduce((s,p)=>s+p.valor,0);
-  // Bug 2 fix: same formula as renderFinancas — use product cost when available
-  const lucro=pedidos.filter(p=>p.pagamento==='pago').reduce((s,p)=>{
-    const prod=produtos.find(pr=>pr.id===p.prodId);
-    const custoUnit=prod&&prod.custo?prod.custo:0;
+  var hoje=new Date();
+  var mes=hoje.getMonth();
+  var ano=hoje.getFullYear();
+  function doMes(p){
+    var parts=p.data?p.data.split('/'):[]; 
+    if(parts.length<3) return false;
+    return parseInt(parts[1])-1===mes && parseInt(parts[2])===ano;
+  }
+  var pedidosMes=pedidos.filter(doMes);
+  // Só vendas PAGAS contam no card principal
+  var vendasPagas=pedidosMes.filter(function(p){return p.pagamento==='pago';});
+  var totalPago=vendasPagas.reduce(function(s,p){return s+p.valor;},0);
+  // Pendentes do mês — sub-info
+  var pendMes=pedidosMes.filter(function(p){return p.pagamento==='pendente';});
+  var totalPendente=pendMes.reduce(function(s,p){return s+p.valor;},0);
+  // Lucro só de pagas
+  var lucro=vendasPagas.reduce(function(s,p){
+    var prod=produtos.find(function(pr){return pr.id===p.prodId;});
+    var custoUnit=prod&&prod.custo?prod.custo:0;
     return s+(custoUnit?(p.valor-custoUnit*p.qtd):p.valor*0.25);
   },0);
-  document.getElementById('cardVendas').textContent='R$ '+totalVendas.toFixed(0);
+  document.getElementById('cardVendas').textContent='R$ '+totalPago.toFixed(0);
   document.getElementById('cardLucro').textContent='R$ '+lucro.toFixed(0);
-  document.getElementById('cardPendentes').textContent=pedidos.filter(p=>p.pagamento==='pendente').length;
+  document.getElementById('cardPendentes').textContent=pedidos.filter(function(p){return p.pagamento==='pendente';}).length;
   document.getElementById('cardClientes').textContent=clientes.length;
+  // Sub-info pendentes no card de vendas
+  var pendInfo=document.getElementById('cardPendentesInfo');
+  if(pendInfo){
+    if(pendMes.length>0){
+      document.getElementById('cardPendentesQtd').textContent=pendMes.length;
+      document.getElementById('cardPendentesVal').textContent='R$ '+totalPendente.toFixed(0);
+      pendInfo.style.display='block';
+    } else {
+      pendInfo.style.display='none';
+    }
+  }
   const devendo=clientes.filter(c=>c.divida>0);
   const el=document.getElementById('dashDevendo');
   if(!devendo.length){
     el.innerHTML='<div class="empty-state" style="padding:1.5rem 1rem"><div class="icon"><span class="ico" style="width:40px;height:40px"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div><h3>Ninguém devendo!</h3><p>Todas as clientes estão em dia.</p></div>';
-  return;
+    return;
   }
   el.innerHTML=devendo.map(c=>`
     <div class="list-item">
@@ -3145,7 +3171,6 @@ function atualizarDashboard(){
         ${c.whats?`<button class="whatsapp-btn" onclick="cobrarWhats('${escapeHtml(c.nome)}','${escapeHtml(c.whats)}',${c.divida})"><span class="ico" style="width:12px;height:12px"><svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span> Cobrar</button>`:''}
       </div>
     </div>`).join('');
-
 }
 function getPerfil(){
   try{
