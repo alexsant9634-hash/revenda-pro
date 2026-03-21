@@ -1690,6 +1690,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 function escapeHtml(str){
   if(!str)return'';
@@ -1697,6 +1698,181 @@ function escapeHtml(str){
 }
 
 // ── Bug 1 fix: persistência via localStorage ──
+// ── SUPABASE ──────────────────────────────────────────────────
+var SUPA_URL = 'https://cmxrbsyutcjvgtlprxog.supabase.co';
+var SUPA_KEY = 'sb_publishable_1tnal9v-spRfBnuBRrUrUw__1xwVKJ0';
+var _supa = null;
+function getSupa(){
+  if(!_supa && window.supabase){
+    _supa = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+  return _supa;
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function login(){
+  var email = document.getElementById('loginEmail').value.trim();
+  var pass  = document.getElementById('loginPass').value;
+  if(!email||!pass){showToast('Preencha todos os campos');return;}
+  var btn = document.querySelector('#loginScreen .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Entrando...';}
+  var supa = getSupa();
+  if(!supa){
+    // fallback sem internet
+    userData={name:email.split('@')[0],email};
+    carregarStorage();
+    salvarStorage();
+    initApp();
+    return;
+  }
+  supa.auth.signInWithPassword({email:email,password:pass}).then(function(res){
+    if(btn){btn.disabled=false;btn.textContent='Entrar na minha conta';}
+    if(res.error){
+      showToast('Erro: '+(res.error.message==='Invalid login credentials'?'E-mail ou senha incorretos':res.error.message));
+      return;
+    }
+    var user = res.data.user;
+    userData = {name: user.user_metadata&&user.user_metadata.nome ? user.user_metadata.nome : email.split('@')[0], email: user.email, id: user.id};
+    salvarStorage();
+    carregarDadosSupabase();
+  });
+}
+
+function register(){
+  var name  = document.getElementById('regName').value.trim();
+  var email = document.getElementById('regEmail').value.trim();
+  var pass  = document.getElementById('regPass').value;
+  if(!name||!email||!pass){showToast('Preencha todos os campos');return;}
+  if(pass.length<6){showToast('Senha deve ter mín. 6 caracteres');return;}
+  var btn = document.querySelector('#registerScreen .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Criando conta...';}
+  var supa = getSupa();
+  if(!supa){
+    userData={name,email};
+    salvarStorage();
+    initApp();
+    return;
+  }
+  supa.auth.signUp({email:email, password:pass, options:{data:{nome:name}}}).then(function(res){
+    if(btn){btn.disabled=false;btn.textContent='Criar minha conta grátis';}
+    if(res.error){showToast('Erro: '+res.error.message);return;}
+    var user = res.data.user;
+    userData = {name:name, email:email, id:user?user.id:null};
+    salvarStorage();
+    showToast('Conta criada! Bem-vinda, '+name+'! 🎉');
+    initApp();
+  });
+}
+
+function logout(){
+  var supa = getSupa();
+  if(supa) supa.auth.signOut();
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  var vr=document.getElementById('btnVendaRapida');
+  if(vr){vr.style.display='none';vr.style.visibility='hidden';}
+  showToast('Até logo!');
+}
+
+// ── CARREGAR DADOS DO SUPABASE ────────────────────────────────
+function carregarDadosSupabase(){
+  var supa = getSupa();
+  if(!supa){initApp();return;}
+  showToast('Carregando seus dados...');
+  var uid = userData.id;
+  if(!uid){initApp();return;}
+
+  Promise.all([
+    supa.from('clientes').select('*').eq('user_id',uid),
+    supa.from('pedidos').select('*').eq('user_id',uid),
+    supa.from('produtos').select('*').eq('user_id',uid),
+    supa.from('despesas').select('*').eq('user_id',uid),
+    supa.from('fornecedores').select('*').eq('user_id',uid),
+    supa.from('configuracoes').select('*').eq('user_id',uid).single()
+  ]).then(function(results){
+    var r = results;
+
+    // Clientes
+    if(r[0].data && r[0].data.length){
+      clientes = r[0].data.map(function(c){
+        return {id:c.id,nome:c.nome,whats:c.whats||'',status:c.status||'ativo',
+                obs:c.obs||'',aniv:c.aniv||'',divida:parseFloat(c.divida)||0,
+                teto:parseFloat(c.teto)||0,_supa_id:c.id};
+      });
+    }
+
+    // Pedidos
+    if(r[1].data && r[1].data.length){
+      pedidos = r[1].data.map(function(p){
+        return {id:p.id,cliId:p.cli_id,prodId:p.prod_id,valor:parseFloat(p.valor)||0,
+                pagamento:p.pagamento||'pago',qtd:parseInt(p.qtd)||1,
+                entrega:p.entrega||'aguardando',data:p.data||'',
+                cliente:p.cliente||'',produto:p.produto||'',_supa_id:p.id};
+      });
+    }
+
+    // Produtos
+    if(r[2].data && r[2].data.length){
+      produtos = r[2].data.map(function(p){
+        return {id:p.id,nome:p.nome,cat:p.cat||'',preco:parseFloat(p.preco)||0,
+                custo:parseFloat(p.custo)||0,estoque:parseInt(p.estoque)||0,
+                estoqueMin:parseInt(p.estoque_min)||0,desc:p.descricao||'',
+                foto:p.foto||'',_supa_id:p.id};
+      });
+    }
+
+    // Despesas
+    if(r[3].data && r[3].data.length){
+      despesas = r[3].data.map(function(d){
+        return {id:d.id,nome:d.nome,valor:parseFloat(d.valor)||0,cat:d.cat||'',
+                mes:d.mes,ano:d.ano,data:d.data||'',_supa_id:d.id};
+      });
+    }
+
+    // Fornecedores
+    if(r[4].data && r[4].data.length){
+      fornecedores = r[4].data.map(function(f){
+        return {id:f.id,razao:f.razao,cnpj:f.cnpj||'',fantasia:f.fantasia||'',
+                inscEstadual:f.insc_estadual||'',cep:f.cep||'',endereco:f.endereco||'',
+                numero:f.numero||'',complemento:f.complemento||'',bairro:f.bairro||'',
+                cidade:f.cidade||'',uf:f.uf||'',contato:f.contato||'',
+                telefone:f.telefone||'',celular:f.celular||'',email:f.email||'',
+                site:f.site||'',instagram:f.instagram||'',obs:f.obs||'',_supa_id:f.id};
+      });
+    }
+
+    // Configurações
+    if(r[5].data){
+      var cfg = r[5].data;
+      metaMensal = parseFloat(cfg.meta_mensal)||0;
+      darkMode   = cfg.dark_mode||false;
+    }
+
+    salvarStorage();
+    initApp();
+  }).catch(function(){
+    // Fallback para localStorage se Supabase falhar
+    carregarStorage();
+    initApp();
+  });
+}
+
+// ── SALVAR NO SUPABASE (sync) ─────────────────────────────────
+function syncSupabase(tabela, dados, uid){
+  var supa = getSupa();
+  if(!supa||!uid) return;
+  // Upsert simples — atualiza ou insere
+  var payload = Object.assign({}, dados, {user_id: uid});
+  delete payload.id;
+  delete payload._supa_id;
+  if(dados._supa_id){
+    supa.from(tabela).update(payload).eq('id', dados._supa_id).then(function(){});
+  } else {
+    supa.from(tabela).insert(payload).then(function(){});
+  }
+}
+// ── END SUPABASE ──────────────────────────────────────────────
+
 function salvarStorage(){
   localStorage.setItem('rp_clientes',JSON.stringify(clientes));
   localStorage.setItem('rp_pedidos',JSON.stringify(pedidos));
@@ -1727,26 +1903,6 @@ let despesas=[];
 let metaMensal=0;
 let fornecedores=[];
 
-function login(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  if(!email||!pass){showToast('Preencha todos os campos');return;}
-  userData={name:email.split('@')[0],email};
-  carregarStorage();
-  userData={name:email.split('@')[0],email};
-  salvarStorage();
-  initApp();
-}
-function register(){
-  const name=document.getElementById('regName').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  if(!name||!email||!pass){showToast('Preencha todos os campos');return;}
-  if(pass.length<6){showToast('Senha deve ter mín. 6 caracteres');return;}
-  userData={name,email};
-  salvarStorage();
-  initApp();
-}
 function showScreen2(s){
   document.getElementById('loginScreen').style.display=s==='login'?'flex':'none';
   document.getElementById('registerScreen').style.display=s==='register'?'flex':'none';
@@ -1782,13 +1938,6 @@ function initApp(){
   }catch(e){}
 
   showToast('Bem-vinda, '+fn+'!');
-}
-function logout(){
-  document.getElementById('app').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
-  var vr=document.getElementById('btnVendaRapida');
-  if(vr){vr.style.display='none';vr.style.visibility='hidden';}
-  showToast('Até logo!');
 }
 function showScreen(id,btn){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -4045,21 +4194,38 @@ function compartilharIndicacao(){
 }
 // ── END INDICAÇÃO ─────────────────────────────────────────────
 
-// Init icons on load + auto-login if session exists
+// Init — verifica sessão Supabase ou localStorage
 window.addEventListener('load', function(){
   carregarStorage();
 
-  // Splash screen — mostrar por 2s depois sumir suavemente
+  // Splash screen
   var splash = document.getElementById('splashScreen');
   setTimeout(function(){
     splash.classList.add('hiding');
-    setTimeout(function(){
-      splash.classList.add('hidden');
-    }, 500);
+    setTimeout(function(){ splash.classList.add('hidden'); }, 500);
   }, 2000);
 
-  if(userData && userData.name){
-    initApp();
+  // Verifica sessão ativa no Supabase
+  var supa = getSupa();
+  if(supa){
+    supa.auth.getSession().then(function(res){
+      if(res.data && res.data.session && res.data.session.user){
+        var user = res.data.session.user;
+        userData = {
+          name: user.user_metadata&&user.user_metadata.nome ? user.user_metadata.nome : user.email.split('@')[0],
+          email: user.email,
+          id: user.id
+        };
+        salvarStorage();
+        carregarDadosSupabase();
+      } else if(userData && userData.name){
+        initApp();
+      }
+    }).catch(function(){
+      if(userData && userData.name) initApp();
+    });
+  } else {
+    if(userData && userData.name) initApp();
   }
 });
 </script>
