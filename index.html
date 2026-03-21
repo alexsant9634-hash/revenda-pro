@@ -1767,8 +1767,15 @@ function register(){
 function logout(){
   var supa = getSupa();
   if(supa) supa.auth.signOut();
+  // Limpa todos os dados locais
+  localStorage.clear();
+  userData = {name:'', email:''};
+  clientes = []; pedidos = []; produtos = [];
+  despesas = []; fornecedores = []; metaMensal = 0;
   document.getElementById('app').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPass').value='';
   var vr=document.getElementById('btnVendaRapida');
   if(vr){vr.style.display='none';vr.style.visibility='hidden';}
   showToast('Até logo!');
@@ -4216,7 +4223,7 @@ window.addEventListener('load', function(){
     setTimeout(function(){ splash.classList.add('hidden'); }, 500);
   }, 2000);
 
-  // Verifica sessão ativa no Supabase
+  // Verifica sessão ativa no Supabase — única fonte de verdade
   var supa = getSupa();
   if(supa){
     supa.auth.getSession().then(function(res){
@@ -4229,13 +4236,17 @@ window.addEventListener('load', function(){
         };
         salvarStorage();
         carregarDadosSupabase();
-      } else if(userData && userData.name){
-        initApp();
+      } else {
+        // Sem sessão ativa — vai para login sempre
+        userData = {name:'', email:''};
+        localStorage.removeItem('rp_userData');
       }
     }).catch(function(){
+      // Sem internet — permite usar localStorage como fallback
       if(userData && userData.name) initApp();
     });
   } else {
+    // Supabase não carregou — fallback offline
     if(userData && userData.name) initApp();
   }
 });
