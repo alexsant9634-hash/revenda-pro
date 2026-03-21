@@ -3878,9 +3878,10 @@ function atualizarEntrega(pedidoId, status){
   if(!p)return;
   p.entrega=status;
   salvarStorage();
+  if(p._supa_id) _supaUpdate('pedidos',p._supa_id,{entrega:status});
   renderPedidos();
-  const labels={aguardando:'Aguardando',saiu:'Saiu para entrega',entregue:'Entregue'};
-  showToast('Entrega: '+labels[status]);
+  const labels={aguardando:'📦 Aguardando',saiu:'🛵 Saiu para entrega',entregue:'✅ Entregue'};
+  showToast(labels[status]);
 }
 // ── END ENTREGA ───────────────────────────────────────────────
 
