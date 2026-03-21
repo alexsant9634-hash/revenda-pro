@@ -1446,7 +1446,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <!-- BOTÃO VENDA RÁPIDA GLOBAL -->
-<button id="btnVendaRapida" onclick="abrirPedidoRapido()" style="position:fixed;bottom:82px;left:1.25rem;width:50px;height:50px;background:linear-gradient(135deg,#2ecc71,#27ae60);border:none;border-radius:15px;color:white;cursor:pointer;box-shadow:0 6px 20px rgba(46,204,113,.4);display:none;align-items:center;justify-content:center;z-index:50;font-size:1.4rem;transition:all .2s;">⚡</button>
+<button id="btnVendaRapida" onclick="abrirPedidoRapido()" style="position:fixed;bottom:82px;left:1.25rem;width:50px;height:50px;background:linear-gradient(135deg,#2ecc71,#27ae60);border:none;border-radius:15px;color:white;cursor:pointer;box-shadow:0 6px 20px rgba(46,204,113,.4);display:none;align-items:center;justify-content:center;z-index:50;font-size:1.4rem;transition:all .2s;visibility:hidden;">⚡</button>
 
 <!-- PEDIDO RÁPIDO -->
 <div class="prapido-overlay" id="prapidoOverlay" onclick="fecharPedidoRapido(event)">
@@ -1770,7 +1770,7 @@ function initApp(){
   verificarAniversarios();
   // show venda rapida button
   const vr=document.getElementById('btnVendaRapida');
-  if(vr) vr.style.display='flex';
+  if(vr){vr.style.display='flex';vr.style.visibility='visible';}
   // load saved profile name if exists
   try{
     const p=JSON.parse(localStorage.getItem('rp_perfil')||'{}');
@@ -1786,6 +1786,8 @@ function initApp(){
 function logout(){
   document.getElementById('app').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
+  var vr=document.getElementById('btnVendaRapida');
+  if(vr){vr.style.display='none';vr.style.visibility='hidden';}
   showToast('Até logo!');
 }
 function showScreen(id,btn){
