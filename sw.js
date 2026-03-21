@@ -1,39 +1,38 @@
-/* ============================================================
-   Revenda Pro — Service Worker
-   Versão: 1.0
-   Estratégia: Cache First para assets, Network First para HTML
-   ============================================================ */
-
+// ── Revenda Pro — Service Worker ──────────────────────────────
 var CACHE_NAME = 'revenda-pro-v1';
-
-/* Arquivos que serão cacheados na instalação */
-var ASSETS_TO_CACHE = [
+var ASSETS = [
+  './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap'
+  './icons/icon-512.png'
 ];
 
-/* ── INSTALL ── Faz cache dos assets essenciais */
+// ── INSTALL — cacheia os arquivos essenciais ──────────────────
 self.addEventListener('install', function(e) {
+  console.log('[SW] Instalando...');
   e.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS_TO_CACHE);
+      console.log('[SW] Cache aberto');
+      return cache.addAll(ASSETS);
     }).then(function() {
       return self.skipWaiting();
     })
   );
 });
 
-/* ── ACTIVATE ── Remove caches antigos */
+// ── ACTIVATE — limpa caches antigos ──────────────────────────
 self.addEventListener('activate', function(e) {
+  console.log('[SW] Ativando...');
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
         keys
           .filter(function(key) { return key !== CACHE_NAME; })
-          .map(function(key) { return caches.delete(key); })
+          .map(function(key) {
+            console.log('[SW] Removendo cache antigo:', key);
+            return caches.delete(key);
+          })
       );
     }).then(function() {
       return self.clients.claim();
@@ -41,45 +40,58 @@ self.addEventListener('activate', function(e) {
   );
 });
 
-/* ── FETCH ── Estratégia: Cache First com fallback para rede */
+// ── FETCH — cache first, network fallback ────────────────────
 self.addEventListener('fetch', function(e) {
-  /* Ignora requisições não-GET */
+  // Ignora requisições não GET
   if (e.request.method !== 'GET') return;
 
-  /* Ignora URLs de extensões do Chrome */
-  if (e.request.url.startsWith('chrome-extension://')) return;
+  // Ignora requisições externas (APIs, CDNs)
+  var url = new URL(e.request.url);
+  if (url.origin !== location.origin) {
+    return;
+  }
 
   e.respondWith(
-    caches.match(e.request).then(function(cachedResponse) {
-      /* Encontrou no cache — retorna imediatamente */
-      if (cachedResponse) {
-        /* Em background, tenta atualizar o cache */
-        fetch(e.request).then(function(networkResponse) {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then(function(cache) {
-              cache.put(e.request, networkResponse);
-            });
-          }
-        }).catch(function() {});
-        return cachedResponse;
-      }
-
-      /* Não está no cache — busca na rede */
-      return fetch(e.request).then(function(networkResponse) {
-        /* Só cacheia respostas válidas */
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
-          return networkResponse;
+    caches.match(e.request).then(function(cached) {
+      // Busca na rede em paralelo para atualizar o cache
+      var networkFetch = fetch(e.request).then(function(response) {
+        if (
+          response &&
+          response.status === 200 &&
+          response.type === 'basic'
+        ) {
+          var clone = response.clone();
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(e.request, clone);
+          });
         }
-        /* Salva no cache para próxima vez */
-        var responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(function(cache) {
-          cache.put(e.request, responseToCache);
-        });
-        return networkResponse;
+        return response;
       }).catch(function() {
-        /* Sem rede e sem cache — retorna o index.html como fallback */
+        // Sem rede e sem cache — retorna index.html offline
         return caches.match('./index.html');
       });
+
+      // Retorna cache imediatamente se disponível, senão aguarda rede
+      return cached || networkFetch;
     })
+  );
+});
+
+// ── PUSH NOTIFICATIONS (futuro) ──────────────────────────────
+self.addEventListener('push', function(e) {
+  if (!e.data) return;
+  var data = e.data.json();
+  self.registration.showNotification(data.title || 'Revenda Pro', {
+    body: data.body || '',
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-72.png',
+    vibrate: [200, 100, 200]
+  });
+});
+
+self.addEventListener('notificationclick', function(e) {
+  e.notification.close();
+  e.waitUntil(
+    clients.openWindow('./')
   );
 });
