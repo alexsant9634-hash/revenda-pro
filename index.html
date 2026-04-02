@@ -1202,13 +1202,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <!-- clear button -->
         <button class="btn" style="margin-top:.9rem;background:var(--bg);color:var(--text-muted);font-size:.8rem;padding:.5rem 1rem;border-radius:10px;border:1px solid var(--border);width:100%;" onclick="limparNotificacoes()">Limpar todas as notificações</button>
       </div>
-      <div class="settings-item" onclick="showToast('Em breve!')">
-        <div class="settings-item-left">
-          <div class="settings-icon"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="22" height="16" x="1" y="4" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span></div>
-          <div><div class="settings-label">Assinatura</div><div class="settings-sub">Plano gratuito ativo</div></div>
-        </div>
-        <span class="chevron-right"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></span>
-      </div>
       <div class="settings-item" onclick="shareCatalogo()">
         <div class="settings-item-left">
           <div class="settings-icon"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></div>
@@ -1321,6 +1314,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <button class="btn btn-primary" id="btnSalvarCliente" onclick="salvarCliente()">Salvar Cliente</button>
     <br><br>
     <button class="btn" style="background:var(--bg);color:var(--text-muted)" onclick="fecharModalCliente()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL UPGRADE -->
+<div class="modal-overlay" id="modalUpgrade" onclick="closeModal('modalUpgrade')">
+  <div class="modal" onclick="event.stopPropagation()" style="text-align:center;padding:1.5rem;">
+    <div class="modal-handle"></div>
+    <div style="font-size:2rem;margin-bottom:.5rem;">🚀</div>
+    <div style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:.3rem;">Funcionalidade Pro</div>
+    <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem;" id="upgradeModalMsg">Esta funcionalidade está disponível no Plano Pro.</div>
+    <div style="background:rgba(26,158,92,.06);border:1px solid rgba(26,158,92,.2);border-radius:12px;padding:.75rem;margin-bottom:1rem;">
+      <div style="font-size:.78rem;font-weight:700;color:var(--rose);">🎉 7 dias grátis para experimentar</div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">Nenhuma cobrança durante o teste.<br>Cancele quando quiser.</div>
+    </div>
+    <button class="btn-assinar" onclick="closeModal('modalUpgrade');assinarPro()">Começar teste grátis de 7 dias →</button>
+    <button class="btn" style="width:100%;margin-top:.5rem;background:none;color:var(--text-muted);font-size:.8rem;" onclick="closeModal('modalUpgrade')">Agora não</button>
   </div>
 </div>
 
@@ -1853,6 +1862,18 @@ function aplicarLimitesPlano(){
       adicionarNotificacao({tipo:'alert',titulo:'Limite do plano grátis',desc:'Você atingiu o limite de 10 produtos. Assine o Pro para adicionar mais.',hora:new Date().toISOString()});
     }
   }
+}
+function isPro(){
+  var plano = userData.plano || 'gratis';
+  return plano === 'pro' || plano === 'trial';
+}
+
+function exigirPro(msg){
+  if(isPro()) return true;
+  var el = document.getElementById('upgradeModalMsg');
+  if(el) el.textContent = msg || 'Esta funcionalidade está disponível no Plano Pro.';
+  document.getElementById('modalUpgrade').classList.add('open');
+  return false;
 }
 // ── END PLANOS ────────────────────────────────────────────────
 var SUPA_URL = 'https://cmxrbsyutcjvgtlprxog.supabase.co';
@@ -2665,6 +2686,12 @@ function excluirCliente(id){
 }
 function salvarCliente(){
   const editId=document.getElementById('cliEditId').value;
+  // Limite plano grátis
+  if(!editId && !isPro() && clientes.length >= 10){
+    fecharModalCliente();
+    exigirPro('Você atingiu o limite de 10 clientes do plano grátis. Assine o Pro para adicionar mais.');
+    return;
+  }
   const nome=document.getElementById('cliNome').value.trim();
   const whats=document.getElementById('cliWhats').value.trim();
   const status=document.getElementById('cliStatus').value;
@@ -2826,6 +2853,12 @@ function preencherValor(){
 }
 function salvarPedido(){
   const editId=document.getElementById('pedEditId').value;
+  // Limite plano grátis
+  if(!editId && !isPro() && pedidos.length >= 20){
+    fecharModalPedido();
+    exigirPro('Você atingiu o limite de 20 pedidos do plano grátis. Assine o Pro para continuar.');
+    return;
+  }
   const cliId=document.getElementById('pedCliente').value;
   const prodId=document.getElementById('pedProduto').value;
   const valor=parseFloat(document.getElementById('pedValor').value);
@@ -3113,6 +3146,12 @@ function excluirProduto(id){
 }
 function salvarProduto(){
   const editId=document.getElementById('prodEditId').value;
+  // Limite plano grátis
+  if(!editId && !isPro() && produtos.length >= 10){
+    fecharModalProduto();
+    exigirPro('Você atingiu o limite de 10 produtos do plano grátis. Assine o Pro para adicionar mais.');
+    return;
+  }
   const nome=document.getElementById('prodNome').value.trim();
   const cat=document.getElementById('prodCat').value;
   const preco=parseFloat(document.getElementById('prodPreco').value);
@@ -4023,6 +4062,7 @@ function tocarSomVenda(){
 }
 // ── END SOM DE VENDA ──────────────────────────────────────────
 function abrirReposicao(){
+  if(!exigirPro('Repor Estoque é uma funcionalidade exclusiva do Plano Pro.')) return;
   const lista=produtos.filter(p=>p.estoque<=Math.max(p.estoqueMin||0,2)||p.estoque===0);
   const el=document.getElementById('reposicaoLista');
   if(!lista.length){
@@ -4051,6 +4091,7 @@ function compartilharReposicao(){
 
 // ── INADIMPLENTES ─────────────────────────────────────────────
 function abrirInadimplentes(){
+  if(!exigirPro('Inadimplentes é uma funcionalidade exclusiva do Plano Pro.')) return;
   const inad=clientes.filter(c=>(c.divida||0)>0).sort((a,b)=>b.divida-a.divida);
   const el=document.getElementById('inadLista');
   if(!inad.length){
@@ -4102,6 +4143,7 @@ function atualizarEntrega(pedidoId, status){
 
 // ── RELATÓRIO MENSAL ──────────────────────────────────────────
 function abrirRelatorio(){
+  if(!exigirPro('Relatórios são uma funcionalidade exclusiva do Plano Pro.')) return;
   const hoje=new Date();
   // pre-select current month
   document.getElementById('relMes').value=hoje.getMonth();
@@ -4301,6 +4343,7 @@ function _fornDrag(modalId, sheetSel){
   },{passive:true});
 }
 function abrirFornecedores(){
+  if(!exigirPro('Fornecedores é uma funcionalidade exclusiva do Plano Pro.')) return;
   renderFornecedores(fornecedores);
   document.getElementById('modalFornecedores').classList.add('open');
   setTimeout(function(){_fornDrag('modalFornecedores');},50);
