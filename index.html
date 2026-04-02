@@ -1734,27 +1734,57 @@ function renderPlanoAtual(){
         <li class="ok">Até 10 clientes</li>
         <li class="ok">Até 20 pedidos</li>
         <li class="ok">Até 10 produtos</li>
-        <li class="no" style="color:var(--text-muted)">Fornecedores</li>
-        <li class="no" style="color:var(--text-muted)">Relatórios</li>
-        <li class="no" style="color:var(--text-muted)">Sem limite de uso</li>
+        <li class="no" style="color:var(--text-muted)">Fornecedores ilimitados</li>
+        <li class="no" style="color:var(--text-muted)">Relatórios completos</li>
+        <li class="no" style="color:var(--text-muted)">Cobrança em massa via WhatsApp</li>
+        <li class="no" style="color:var(--text-muted)">Meta de vendas</li>
+        <li class="no" style="color:var(--text-muted)">Ranking de clientes</li>
       </ul>
-      <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.5rem;">Experimente o Plano Pro <strong>grátis por 7 dias</strong> — sem cobrança agora.</div>
-      <button class="btn-assinar" onclick="assinarPro()">🚀 Testar Pro grátis por 7 dias</button>`;
+      <div style="background:linear-gradient(135deg,rgba(26,158,92,.08),rgba(26,158,92,.04));border:1px solid rgba(26,158,92,.2);border-radius:12px;padding:.75rem;margin-bottom:.75rem;">
+        <div style="font-size:.8rem;font-weight:700;color:var(--rose);margin-bottom:.3rem;">🚀 Plano Pro — R$ 19,90/mês</div>
+        <ul class="plano-features" style="margin:.35rem 0 0;">
+          <li class="ok">Clientes, pedidos e produtos ilimitados</li>
+          <li class="ok">Catálogo ilimitado com fotos</li>
+          <li class="ok">Fornecedores ilimitados com busca de CEP</li>
+          <li class="ok">Relatórios por mês e por dia</li>
+          <li class="ok">Cobrança em massa via WhatsApp + Pix</li>
+          <li class="ok">Meta de vendas e ranking</li>
+          <li class="ok">Controle de estoque com alertas</li>
+          <li class="ok">Teto de gastos por cliente</li>
+          <li class="ok">Venda rápida ⚡</li>
+          <li class="ok">Modo escuro</li>
+          <li class="ok">Funciona offline</li>
+        </ul>
+      </div>
+      <div style="background:rgba(26,158,92,.06);border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;text-align:center;">
+        <div style="font-size:.78rem;color:var(--rose);font-weight:700;">🎉 7 dias grátis para experimentar</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">Nenhuma cobrança durante o período de teste.<br>Cancele quando quiser, sem burocracia.</div>
+      </div>
+      <button class="btn-assinar" onclick="assinarPro()">Começar teste grátis de 7 dias →</button>
+      <div style="text-align:center;font-size:.68rem;color:var(--text-muted);margin-top:.4rem;">💳 Cartão necessário apenas para continuar após o teste</div>`;
   } else if(plano === 'pro' || plano === 'trial'){
     var badge = plano === 'trial'
       ? '<div class="plano-badge trial">⏳ Trial — 7 dias grátis</div>'
-      : '<div class="plano-badge pro">✅ Plano Pro</div>';
+      : '<div class="plano-badge pro">✅ Plano Pro Ativo</div>';
+    var msg = plano === 'trial'
+      ? '<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Seu período de teste está ativo. Após 7 dias será cobrado R$ 19,90/mês automaticamente. Cancele quando quiser.</div>'
+      : '<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Sua assinatura está ativa. Obrigada por assinar o Revenda Pro! 💚</div>';
     el.innerHTML = `
       ${badge}
+      ${msg}
       <ul class="plano-features">
-        <li class="ok">Clientes ilimitados</li>
-        <li class="ok">Pedidos ilimitados</li>
-        <li class="ok">Produtos ilimitados</li>
-        <li class="ok">Fornecedores</li>
+        <li class="ok">Clientes, pedidos e produtos ilimitados</li>
+        <li class="ok">Catálogo ilimitado com fotos</li>
+        <li class="ok">Fornecedores ilimitados</li>
         <li class="ok">Relatórios completos</li>
-        <li class="ok">Cobrança via WhatsApp</li>
+        <li class="ok">Cobrança em massa via WhatsApp + Pix</li>
+        <li class="ok">Meta de vendas e ranking</li>
+        <li class="ok">Controle de estoque com alertas</li>
+        <li class="ok">Teto de gastos por cliente</li>
+        <li class="ok">Venda rápida ⚡</li>
+        <li class="ok">Funciona offline</li>
       </ul>
-      <button class="btn-gerenciar" onclick="gerenciarAssinatura()">Gerenciar assinatura</button>`;
+      <button class="btn-gerenciar" onclick="gerenciarAssinatura()">⚙️ Gerenciar assinatura</button>`;
   }
 }
 
