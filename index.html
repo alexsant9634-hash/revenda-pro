@@ -1825,63 +1825,90 @@ function renderPlanoAtual(){
   var plano = userData.plano || 'gratis';
 
   if(plano === 'gratis'){
-    el.innerHTML = `
-      <div class="plano-badge gratis">⭐ Plano Grátis</div>
-      <ul class="plano-features">
-        <li class="ok">Até 10 clientes</li>
-        <li class="ok">Até 20 pedidos</li>
-        <li class="ok">Até 10 produtos</li>
-        <li class="no" style="color:var(--text-muted)">Fornecedores ilimitados</li>
-        <li class="no" style="color:var(--text-muted)">Relatórios completos</li>
-        <li class="no" style="color:var(--text-muted)">Cobrança em massa via WhatsApp</li>
-        <li class="no" style="color:var(--text-muted)">Meta de vendas</li>
-        <li class="no" style="color:var(--text-muted)">Ranking de clientes</li>
-      </ul>
-      <div style="background:linear-gradient(135deg,rgba(26,158,92,.08),rgba(26,158,92,.04));border:1px solid rgba(26,158,92,.2);border-radius:12px;padding:.75rem;margin-bottom:.75rem;">
-        <div style="font-size:.8rem;font-weight:700;color:var(--rose);margin-bottom:.3rem;">🚀 Plano Pro — R$ 19,90/mês</div>
-        <ul class="plano-features" style="margin:.35rem 0 0;">
-          <li class="ok">Clientes, pedidos e produtos ilimitados</li>
-          <li class="ok">Catálogo ilimitado com fotos</li>
-          <li class="ok">Fornecedores ilimitados com busca de CEP</li>
-          <li class="ok">Relatórios por mês e por dia</li>
-          <li class="ok">Cobrança em massa via WhatsApp + Pix</li>
-          <li class="ok">Meta de vendas e ranking</li>
-          <li class="ok">Controle de estoque com alertas</li>
-          <li class="ok">Teto de gastos por cliente</li>
-          <li class="ok">Venda rápida ⚡</li>
-          <li class="ok">Modo escuro</li>
-          <li class="ok">Funciona offline</li>
-        </ul>
-      </div>
-      <div style="background:rgba(26,158,92,.06);border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;text-align:center;">
-        <div style="font-size:.78rem;color:var(--rose);font-weight:700;">🎉 7 dias grátis para experimentar</div>
-        <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">Nenhuma cobrança durante o período de teste.<br>Cancele quando quiser, sem burocracia.</div>
-      </div>
-      <button class="btn-assinar" onclick="assinarPro()">Começar teste grátis de 7 dias →</button>
-      <div style="text-align:center;font-size:.68rem;color:var(--text-muted);margin-top:.4rem;">💳 Cartão necessário apenas para continuar após o teste</div>`;
+    // Item 9 — Limites visuais
+    var cliUsados = clientes.length;
+    var prodUsados = produtos.length;
+    var pedUsados = pedidos.length;
+    var cliPct = Math.round((cliUsados/10)*100);
+    var prodPct = Math.round((prodUsados/10)*100);
+    var pedPct = Math.round((pedUsados/20)*100);
+
+    function barraLimite(usado, total, label){
+      var pct = Math.min(100, Math.round((usado/total)*100));
+      var cor = pct >= 90 ? '#ef4444' : pct >= 70 ? '#f59e0b' : 'var(--rose)';
+      return '<div style="margin-bottom:.5rem;">'+
+        '<div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);margin-bottom:.2rem;">'+
+        '<span>'+label+'</span><span style="font-weight:700;color:'+cor+'">'+usado+'/'+total+'</span></div>'+
+        '<div style="height:4px;background:var(--border);border-radius:2px;">'+
+        '<div style="height:4px;background:'+cor+';border-radius:2px;width:'+pct+'%;transition:width .3s;"></div></div></div>';
+    }
+
+    el.innerHTML =
+      '<div class="plano-badge gratis">⭐ Plano Grátis</div>'+
+      '<div style="margin-bottom:.75rem;">'+
+        barraLimite(cliUsados, 10, 'Clientes')+
+        barraLimite(prodUsados, 10, 'Produtos')+
+        barraLimite(pedUsados, 20, 'Pedidos')+
+      '</div>'+
+      '<div style="background:linear-gradient(135deg,rgba(26,158,92,.08),rgba(26,158,92,.04));border:1px solid rgba(26,158,92,.2);border-radius:12px;padding:.85rem;margin-bottom:.75rem;">'+
+        '<div style="font-size:.8rem;font-weight:700;color:var(--rose);margin-bottom:.4rem;">🚀 Plano Pro — R$ 19,90/mês</div>'+
+        '<ul class="plano-features" style="margin:.35rem 0 0;">'+
+          '<li class="ok">Clientes, pedidos e produtos ilimitados</li>'+
+          '<li class="ok">Catálogo ilimitado com fotos</li>'+
+          '<li class="ok">Fornecedores ilimitados com busca de CEP</li>'+
+          '<li class="ok">Relatórios por mês e por dia</li>'+
+          '<li class="ok">Cobrança em massa via WhatsApp + Pix</li>'+
+          '<li class="ok">Meta de vendas e ranking</li>'+
+          '<li class="ok">Controle de estoque com alertas</li>'+
+          '<li class="ok">Teto de gastos por cliente</li>'+
+          '<li class="ok">Venda rápida ⚡</li>'+
+          '<li class="ok">Modo escuro</li>'+
+          '<li class="ok">Funciona offline</li>'+
+        '</ul>'+
+      '</div>'+
+      '<div style="background:rgba(26,158,92,.06);border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;text-align:center;">'+
+        '<div style="font-size:.78rem;color:var(--rose);font-weight:700;">🎉 7 dias grátis para experimentar</div>'+
+        '<div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">Nenhuma cobrança durante o período de teste.<br>Cancele quando quiser, sem burocracia.</div>'+
+      '</div>'+
+      '<button class="btn-assinar" onclick="assinarPro()">Começar teste grátis de 7 dias →</button>'+
+      '<div style="text-align:center;font-size:.68rem;color:var(--text-muted);margin-top:.4rem;">💳 Cartão necessário apenas para continuar após o teste</div>';
+
   } else if(plano === 'pro' || plano === 'trial'){
+    // Item 8 — Contador de dias do trial
+    var trialMsg = '';
+    if(plano === 'trial' && userData.trialExpiraEm){
+      var expira = new Date(userData.trialExpiraEm);
+      var hoje = new Date();
+      var diff = Math.ceil((expira - hoje) / (1000*60*60*24));
+      if(diff > 0){
+        var cor = diff <= 2 ? '#ef4444' : diff <= 3 ? '#f59e0b' : 'var(--rose)';
+        trialMsg = '<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;text-align:center;">'+
+          '<div style="font-size:.8rem;font-weight:700;color:'+cor+';">⏳ Seu trial termina em <strong>'+diff+' dia'+(diff>1?'s':'')+'</strong></div>'+
+          '<div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">Após esse período será cobrado R$ 19,90/mês automaticamente.</div>'+
+          '</div>';
+      }
+    }
     var badge = plano === 'trial'
       ? '<div class="plano-badge trial">⏳ Trial — 7 dias grátis</div>'
       : '<div class="plano-badge pro">✅ Plano Pro Ativo</div>';
     var msg = plano === 'trial'
-      ? '<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Seu período de teste está ativo. Após 7 dias será cobrado R$ 19,90/mês automaticamente. Cancele quando quiser.</div>'
+      ? ''
       : '<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem;">Sua assinatura está ativa. Obrigada por assinar o Revenda Pro! 💚</div>';
-    el.innerHTML = `
-      ${badge}
-      ${msg}
-      <ul class="plano-features">
-        <li class="ok">Clientes, pedidos e produtos ilimitados</li>
-        <li class="ok">Catálogo ilimitado com fotos</li>
-        <li class="ok">Fornecedores ilimitados</li>
-        <li class="ok">Relatórios completos</li>
-        <li class="ok">Cobrança em massa via WhatsApp + Pix</li>
-        <li class="ok">Meta de vendas e ranking</li>
-        <li class="ok">Controle de estoque com alertas</li>
-        <li class="ok">Teto de gastos por cliente</li>
-        <li class="ok">Venda rápida ⚡</li>
-        <li class="ok">Funciona offline</li>
-      </ul>
-      <button class="btn-gerenciar" onclick="gerenciarAssinatura()">⚙️ Gerenciar assinatura</button>`;
+    el.innerHTML =
+      badge + msg + trialMsg +
+      '<ul class="plano-features">'+
+        '<li class="ok">Clientes, pedidos e produtos ilimitados</li>'+
+        '<li class="ok">Catálogo ilimitado com fotos</li>'+
+        '<li class="ok">Fornecedores ilimitados</li>'+
+        '<li class="ok">Relatórios completos</li>'+
+        '<li class="ok">Cobrança em massa via WhatsApp + Pix</li>'+
+        '<li class="ok">Meta de vendas e ranking</li>'+
+        '<li class="ok">Controle de estoque com alertas</li>'+
+        '<li class="ok">Teto de gastos por cliente</li>'+
+        '<li class="ok">Venda rápida ⚡</li>'+
+        '<li class="ok">Funciona offline</li>'+
+      '</ul>'+
+      '<button class="btn-gerenciar" onclick="gerenciarAssinatura()">⚙️ Gerenciar assinatura</button>';
   }
 }
 
@@ -1926,9 +1953,10 @@ function gerenciarAssinatura(){
 function verificarPlanoSupabase(){
   var supa = getSupa(); var uid = _uid();
   if(!supa||!uid) return;
-  supa.from('usuarios').select('plano').eq('id',uid).single().then(function(r){
+  supa.from('usuarios').select('plano, trial_expira_em').eq('id',uid).single().then(function(r){
     if(r.data && r.data.plano){
       userData.plano = r.data.plano;
+      userData.trialExpiraEm = r.data.trial_expira_em || null;
       salvarStorage();
       renderPlanoAtual();
       aplicarLimitesPlano();
@@ -1998,6 +2026,12 @@ function login(){
     }
     var user = res.data.user;
     userData = {name: user.user_metadata&&user.user_metadata.nome ? user.user_metadata.nome : email.split('@')[0], email: user.email, id: user.id};
+    // Salva nome no perfil local se não existir
+    var pfAtual = {};
+    try{pfAtual=JSON.parse(localStorage.getItem('rp_perfil')||'{}');}catch(e){}
+    if(!pfAtual.nome && userData.name) pfAtual.nome = userData.name;
+    if(!pfAtual.email) pfAtual.email = userData.email;
+    localStorage.setItem('rp_perfil', JSON.stringify(pfAtual));
     salvarStorage();
     carregarDadosSupabase();
   });
@@ -2022,7 +2056,13 @@ function register(){
     if(btn){btn.disabled=false;btn.textContent='Criar minha conta grátis';}
     if(res.error){showToast('Erro: '+res.error.message);return;}
     var user = res.data.user;
-    userData = {name:name, email:email, id:user?user.id:null};
+    userData = {name:name, email:email, id:user?user.id:null, plano:'gratis'};
+    // Salva nome no perfil local automaticamente
+    var pfAtual = {};
+    try{pfAtual=JSON.parse(localStorage.getItem('rp_perfil')||'{}');}catch(e){}
+    pfAtual.nome = name;
+    pfAtual.email = email;
+    localStorage.setItem('rp_perfil', JSON.stringify(pfAtual));
     salvarStorage();
     showToast('Conta criada! Bem-vinda, '+name+'! 🎉');
     initApp();
