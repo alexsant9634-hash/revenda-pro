@@ -259,6 +259,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .modal-overlay.open{display:flex;}
 .modal{background:var(--card-bg);border-radius:28px 28px 0 0;padding:1.5rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;animation:slideUpModal .3s ease;}
 @keyframes slideUpModal{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes bounceIn{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 1.25rem;}
 .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;}
 .modal-title i{color:var(--rose);}
@@ -1385,6 +1386,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
+<!-- MODAL SUCESSO ASSINATURA -->
+<div class="modal-overlay" id="modalSucesso" style="z-index:650;">
+  <div class="modal" onclick="event.stopPropagation()" style="padding:1.75rem;text-align:center;">
+    <div class="modal-handle"></div>
+    <div style="font-size:3rem;margin-bottom:.5rem;animation:bounceIn .6s ease;">🎉</div>
+    <div style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:.4rem;">Parabéns! Você é Pro agora!</div>
+    <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">Seu acesso completo está ativo. Aproveite todas as funcionalidades sem limites!</div>
+    <div style="background:linear-gradient(135deg,rgba(26,158,92,.08),rgba(26,158,92,.04));border:1px solid rgba(26,158,92,.2);border-radius:12px;padding:.85rem;margin-bottom:1.1rem;">
+      <div style="font-size:.8rem;color:var(--text);line-height:1.7;">
+        ✅ Clientes, pedidos e produtos ilimitados<br>
+        ✅ Relatórios completos<br>
+        ✅ Fornecedores ilimitados<br>
+        ✅ Cobrança via WhatsApp + Pix
+      </div>
+    </div>
+    <button class="btn-assinar" onclick="fecharModalSucesso()">Começar a usar! 🚀</button>
+  </div>
+</div>
+
 <!-- MODAL UPGRADE -->
 <div class="modal-overlay" id="modalUpgrade" onclick="closeModal('modalUpgrade')">
   <div class="modal" onclick="event.stopPropagation()" style="text-align:center;padding:1.5rem;">
@@ -2213,6 +2233,30 @@ function onboardingNext(slide){
     if(dot) dot.classList.toggle('active', i===slide);
   }
 }
+function fecharModalSucesso(){
+  document.getElementById('modalSucesso').classList.remove('open');
+  // Limpa URL para não reabrir ao recarregar
+  window.history.replaceState({}, '', window.location.pathname);
+  renderPlanoAtual();
+  atualizarDashboard();
+}
+
+function verificarRetornoStripe(){
+  var params = new URLSearchParams(window.location.search);
+  var status = params.get('status');
+  var plano = params.get('plano');
+  if(status === 'sucesso' && plano){
+    // Atualiza plano localmente enquanto webhook processa
+    userData.plano = plano;
+    salvarStorage();
+    setTimeout(function(){
+      document.getElementById('modalSucesso').classList.add('open');
+    }, 1000);
+  } else if(status === 'cancelado'){
+    showToast('Assinatura cancelada. Você continua no plano grátis.');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
 function fecharOnboarding(){
   document.getElementById('modalOnboarding').classList.remove('open');
   localStorage.setItem('rp_onboarding_done','1');
@@ -2264,6 +2308,7 @@ function initApp(){
   verificarAniversarios();
   renderPlanoAtual();
   verificarPlanoSupabase();
+  verificarRetornoStripe();
   // Onboarding — só na primeira vez
   setTimeout(function(){ mostrarOnboarding(); }, 800);
   // show venda rapida button
