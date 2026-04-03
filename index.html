@@ -854,6 +854,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <p>Aqui está o resumo das suas vendas</p>
       </div>
 
+      <!-- BANNER PRO — só aparece no plano grátis -->
+      <div id="dashBannerPro" style="display:none;background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-radius:16px;padding:1rem 1.1rem;margin-bottom:1rem;cursor:pointer;box-shadow:0 6px 24px rgba(26,158,92,.3);" onclick="assinarPro()">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;">
+          <div>
+            <div style="font-size:.85rem;font-weight:800;color:white;margin-bottom:.2rem;">🚀 Experimente o Plano Pro</div>
+            <div style="font-size:.73rem;color:rgba(255,255,255,.85);">7 dias grátis · Sem cobrança agora · Cancele quando quiser</div>
+          </div>
+          <div style="background:white;color:var(--rose);border-radius:10px;padding:.4rem .85rem;font-size:.78rem;font-weight:800;white-space:nowrap;flex-shrink:0;">Testar grátis</div>
+        </div>
+      </div>
+
       <div class="cards-grid">
         <div class="summary-card" onclick="showScreen('screenFinancas',null)">
           <div class="card-icon"><span class="ico" style="width:22px;height:22px"><svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span></div>
@@ -3355,6 +3366,10 @@ function atualizarDashboard(){
       pendInfo.style.display='none';
     }
   }
+  // Banner Pro — só mostra no plano grátis
+  var banner = document.getElementById('dashBannerPro');
+  if(banner) banner.style.display = isPro() ? 'none' : 'block';
+
   const devendo=clientes.filter(c=>c.divida>0);
   const el=document.getElementById('dashDevendo');
   if(!devendo.length){
