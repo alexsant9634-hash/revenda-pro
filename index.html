@@ -287,6 +287,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .btn-assinar{width:100%;padding:.8rem;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:opacity .2s;}
 .btn-assinar:active{opacity:.85;}
 .btn-gerenciar{width:100%;padding:.8rem;background:none;color:var(--rose);border:1.5px solid rgba(26,158,92,.3);border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:all .2s;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .2s;}
+.ob-dot.active{background:var(--rose);width:20px;border-radius:4px;}
 .logout-btn{width:100%;padding:.9rem;border:1.5px solid rgba(26,158,92,.3);border-radius:12px;background:none;color:var(--rose);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
 .logout-btn:hover{background:var(--rose);color:white;border-color:transparent;}
 .logout-btn i{color:inherit;}
@@ -783,6 +785,58 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   <button class="pwa-banner-close" onclick="fecharPwaBanner()">✕</button>
 </div>
 
+<!-- ONBOARDING -->
+<div class="modal-overlay" id="modalOnboarding" style="z-index:600;">
+  <div class="modal" onclick="event.stopPropagation()" style="padding:1.5rem;text-align:center;">
+    <div class="modal-handle"></div>
+    <div id="onboardingSlides">
+
+      <!-- Slide 1 -->
+      <div class="onboarding-slide" id="obSlide1">
+        <div style="font-size:2.5rem;margin-bottom:.5rem;">👋</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:.4rem;">Bem-vinda ao Revenda Pro!</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">Seu assistente de vendas para revendedoras de cosméticos. Vamos te mostrar como começar em 3 passos simples.</div>
+        <button class="btn-assinar" onclick="onboardingNext(2)">Próximo →</button>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="onboarding-slide" id="obSlide2" style="display:none;">
+        <div style="font-size:2.5rem;margin-bottom:.5rem;">👤</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:.4rem;">1. Cadastre suas clientes</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">Adicione o nome e WhatsApp de cada cliente. Assim você controla quem deve, quem comprou e quando cobrar.</div>
+        <button class="btn-assinar" onclick="onboardingNext(3)">Próximo →</button>
+        <button class="btn" style="width:100%;margin-top:.5rem;background:none;color:var(--text-muted);font-size:.8rem;" onclick="onboardingNext(1)">← Voltar</button>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="onboarding-slide" id="obSlide3" style="display:none;">
+        <div style="font-size:2.5rem;margin-bottom:.5rem;">📦</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:.4rem;">2. Cadastre seus produtos</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">Adicione os produtos que você vende com preço, custo e estoque. O app te avisa quando estiver acabando.</div>
+        <button class="btn-assinar" onclick="onboardingNext(4)">Próximo →</button>
+        <button class="btn" style="width:100%;margin-top:.5rem;background:none;color:var(--text-muted);font-size:.8rem;" onclick="onboardingNext(2)">← Voltar</button>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="onboarding-slide" id="obSlide4" style="display:none;">
+        <div style="font-size:2.5rem;margin-bottom:.5rem;">⚡</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:.4rem;">3. Registre suas vendas</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">Use o botão <strong>⚡ Venda Rápida</strong> para registrar vendas em segundos. O estoque e as dívidas atualizam automaticamente.</div>
+        <button class="btn-assinar" onclick="fecharOnboarding()">Começar agora! 🚀</button>
+        <button class="btn" style="width:100%;margin-top:.5rem;background:none;color:var(--text-muted);font-size:.8rem;" onclick="onboardingNext(3)">← Voltar</button>
+      </div>
+
+    </div>
+    <!-- Indicadores -->
+    <div style="display:flex;justify-content:center;gap:.4rem;margin-top:1rem;" id="onboardingDots">
+      <div class="ob-dot active" id="obDot1"></div>
+      <div class="ob-dot" id="obDot2"></div>
+      <div class="ob-dot" id="obDot3"></div>
+      <div class="ob-dot" id="obDot4"></div>
+    </div>
+  </div>
+</div>
+
 <!-- NOTIF OVERLAY + PANEL -->
 <div class="notif-overlay" id="notifOverlay" onclick="fecharNotificacoes()"></div>
 <div class="notif-panel" id="notifPanel"></div>
@@ -806,6 +860,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <p class="auth-sub">Entre na sua conta para continuar</p>
     <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" placeholder="seu@email.com" id="loginEmail"></div>
     <div class="form-group"><label class="form-label">Senha</label><div style="position:relative;"><input type="password" class="form-input" placeholder="••••••••" id="loginPass" style="padding-right:2.5rem;"><button type="button" onclick="toggleSenha('loginPass',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;display:flex;align-items:center;"><svg id="loginPassIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+    <div style="text-align:right;margin-top:-.5rem;margin-bottom:.75rem;">
+      <a onclick="esqueciSenha()" style="font-size:.78rem;color:var(--rose);cursor:pointer;font-weight:600;">Esqueci minha senha</a>
+    </div>
     <button class="btn btn-primary" onclick="login()">Entrar na minha conta</button>
     <p class="auth-switch">Não tem conta? <a onclick="showScreen2('register')">Cadastre-se grátis</a></p>
   </div>
@@ -2141,6 +2198,47 @@ function toggleSenha(inputId, btn){
     : '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>';
   btn.style.color = mostrar ? 'var(--rose)' : 'var(--text-muted)';
 }
+// ── ONBOARDING ────────────────────────────────────────────────
+function mostrarOnboarding(){
+  if(localStorage.getItem('rp_onboarding_done')) return;
+  document.getElementById('modalOnboarding').classList.add('open');
+}
+function onboardingNext(slide){
+  for(var i=1;i<=4;i++){
+    var el=document.getElementById('obSlide'+i);
+    var dot=document.getElementById('obDot'+i);
+    if(el) el.style.display = i===slide ? 'block' : 'none';
+    if(dot) dot.classList.toggle('active', i===slide);
+  }
+}
+function fecharOnboarding(){
+  document.getElementById('modalOnboarding').classList.remove('open');
+  localStorage.setItem('rp_onboarding_done','1');
+}
+// ── END ONBOARDING ────────────────────────────────────────────
+
+function esqueciSenha(){
+  var email = document.getElementById('loginEmail').value.trim();
+  if(!email){
+    showToast('Digite seu e-mail primeiro');
+    document.getElementById('loginEmail').focus();
+    return;
+  }
+  var supa = getSupa();
+  if(!supa){showToast('Sem conexão. Tente novamente.');return;}
+  var btn = document.querySelector('#loginScreen .btn-primary');
+  if(btn){btn.disabled=true;}
+  supa.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://alexsant9634-hash.github.io/revenda-pro/'
+  }).then(function(res){
+    if(btn){btn.disabled=false;}
+    if(res.error){
+      showToast('Erro: '+res.error.message);
+    } else {
+      showToast('✅ E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+    }
+  });
+}
 function showScreen2(s){
   document.getElementById('loginScreen').style.display=s==='login'?'flex':'none';
   document.getElementById('registerScreen').style.display=s==='register'?'flex':'none';
@@ -2164,6 +2262,8 @@ function initApp(){
   verificarAniversarios();
   renderPlanoAtual();
   verificarPlanoSupabase();
+  // Onboarding — só na primeira vez
+  setTimeout(function(){ mostrarOnboarding(); }, 800);
   // show venda rapida button
   const vr=document.getElementById('btnVendaRapida');
   if(vr){vr.style.display='flex';vr.style.visibility='visible';}
