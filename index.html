@@ -2012,14 +2012,16 @@ function register(){
 function logout(){
   var supa = getSupa();
   if(supa) supa.auth.signOut();
-  // Preserva perfil e chave Pix — são dados do dispositivo
+  // Preserva dados do dispositivo
   var perfilSalvo = localStorage.getItem('rp_perfil');
   var configSalvo = localStorage.getItem('rp_config');
+  var onboardingSalvo = localStorage.getItem('rp_onboarding_done');
   // Limpa dados da sessão
   localStorage.clear();
-  // Restaura perfil e pix
+  // Restaura dados do dispositivo
   if(perfilSalvo) localStorage.setItem('rp_perfil', perfilSalvo);
   if(configSalvo) localStorage.setItem('rp_config', configSalvo);
+  if(onboardingSalvo) localStorage.setItem('rp_onboarding_done', onboardingSalvo);
   userData = {name:'', email:''};
   clientes = []; pedidos = []; produtos = [];
   despesas = []; fornecedores = []; metaMensal = 0;
