@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Revenda Pro — Gestão inteligente para revendedoras de cosméticos. Controle clientes, vendas, estoque e cobranças em um só lugar.">
+<title>Revenda Pro — Gestão para Revendedoras de Cosméticos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#1a9e5c;--green-dark:#0f7a42;--green-light:#e8f7ef;
+  --text:#111111;--text-muted:#666666;--bg:#fafafa;
+  --border:rgba(0,0,0,0.08);--orange:#f59e0b;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:rgba(250,250,250,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:.6rem;}
+.nav-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.nav-logo-icon svg{width:18px;height:18px;}
+.nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--text);}
+.nav-logo-name span{color:var(--green);}
+.nav-cta{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;border:none;border-radius:10px;padding:.55rem 1.2rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:none;}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 1.5rem 4rem;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#f0faf5 0%,#fafafa 50%,#f5fff9 100%);z-index:0;}
+.hero-circle{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(26,158,92,.12),transparent 70%);}
+.hero-circle-1{width:600px;height:600px;top:-200px;right:-200px;}
+.hero-circle-2{width:400px;height:400px;bottom:-150px;left:-150px;}
+.hero-content{position:relative;z-index:1;max-width:680px;}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--green-light);color:var(--green-dark);border:1px solid rgba(26,158,92,.2);border-radius:20px;padding:.35rem .9rem;font-size:.78rem;font-weight:700;margin-bottom:1.5rem;animation:fadeUp .6s ease both;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,8vw,3.8rem);font-weight:700;line-height:1.15;color:var(--text);margin-bottom:1.25rem;animation:fadeUp .6s .1s ease both;}
+.hero-title span{color:var(--green);}
+.hero-sub{font-size:clamp(.95rem,3vw,1.1rem);color:var(--text-muted);max-width:480px;margin:0 auto 2rem;animation:fadeUp .6s .2s ease both;}
+.hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;animation:fadeUp .6s .3s ease both;}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;border:none;border-radius:14px;padding:.9rem 2rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;box-shadow:0 8px 32px rgba(26,158,92,.3);transition:all .2s;}
+.btn-primary:hover{transform:translateY(-2px);}
+.hero-note{font-size:.78rem;color:var(--text-muted);}
+.hero-mockups{position:relative;z-index:1;margin-top:3.5rem;display:flex;align-items:flex-end;justify-content:center;gap:1.25rem;animation:fadeUp .6s .4s ease both;}
+.mockup-wrap{display:flex;flex-direction:column;align-items:center;}
+.mockup-label{font-size:.68rem;font-weight:700;color:var(--green);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;}
+.mockup-wrap.side{opacity:.72;transform:scale(.86);}
+.mockup-phone{background:white;border-radius:28px;box-shadow:0 24px 60px rgba(0,0,0,.12),0 4px 16px rgba(0,0,0,.06);overflow:hidden;border:2px solid rgba(0,0,0,.05);}
+.mockup-wrap.center .mockup-phone{width:200px;}
+.mockup-wrap.side .mockup-phone{width:162px;}
+.m-status{background:var(--green);padding:.4rem .8rem;display:flex;justify-content:space-between;align-items:center;}
+.m-status span{color:white;font-size:.58rem;font-weight:600;}
+.m-body{padding:.6rem;}
+.m-hero-dash{background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:10px;padding:.5rem .6rem;margin-bottom:.4rem;text-align:center;}
+.m-greeting{font-size:.52rem;color:rgba(255,255,255,.8);}
+.m-dash-name{font-size:.68rem;font-weight:800;color:white;}
+.m-cards{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.4rem;}
+.m-card{background:var(--bg);border-radius:7px;padding:.32rem .38rem;}
+.m-card-val{font-size:.62rem;font-weight:800;color:var(--text);}
+.m-card-lbl{font-size:.44rem;color:var(--text-muted);}
+.m-card-sub{font-size:.4rem;color:var(--orange);font-weight:600;}
+.m-sec{font-size:.5rem;font-weight:700;color:var(--text-muted);margin-bottom:.28rem;}
+.m-list{display:flex;flex-direction:column;gap:.22rem;}
+.m-item{background:var(--bg);border-radius:7px;padding:.28rem .38rem;display:flex;align-items:center;gap:.3rem;}
+.m-av{width:15px;height:15px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;font-size:.42rem;color:white;font-weight:700;flex-shrink:0;}
+.m-inf{flex:1;}
+.m-nm{font-size:.5rem;font-weight:700;color:var(--text);}
+.m-vl{font-size:.44rem;color:var(--text-muted);}
+.m-bg{font-size:.4rem;padding:.1rem .25rem;border-radius:3px;font-weight:700;white-space:nowrap;}
+.bg-g{background:#dcfce7;color:#166534;}
+.bg-o{background:#fef3c7;color:#92400e;}
+.m-ped{background:var(--bg);border-radius:7px;padding:.32rem .38rem;margin-bottom:.22rem;}
+.m-ped-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.m-ped-prod{font-size:.52rem;font-weight:700;color:var(--text);}
+.m-ped-cli{font-size:.44rem;color:var(--text-muted);}
+.m-ped-row{display:flex;justify-content:space-between;margin-top:.18rem;}
+.m-ped-val{font-size:.52rem;font-weight:800;color:var(--green);}
+.m-ped-hr{font-size:.4rem;color:var(--text-muted);}
+.m-prog{display:flex;gap:.18rem;margin-top:.22rem;}
+.m-step{flex:1;height:3px;border-radius:2px;background:#e5e7eb;}
+.m-step.done{background:var(--green);}
+.m-step.act{background:var(--orange);}
+.m-prod{display:flex;align-items:center;gap:.3rem;background:var(--bg);border-radius:7px;padding:.28rem .38rem;margin-bottom:.22rem;}
+.m-prod-img{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;}
+.m-prod-info{flex:1;}
+.m-prod-nm{font-size:.5rem;font-weight:700;color:var(--text);}
+.m-prod-pr{font-size:.46rem;color:var(--green);font-weight:700;}
+.m-prod-st{font-size:.4rem;color:var(--text-muted);}
+.m-prod-st.low{color:#ef4444;font-weight:700;}
+section{padding:5rem 1.5rem;}
+.container{max-width:900px;margin:0 auto;}
+.section-label{font-size:.75rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.2;margin-bottom:1rem;}
+.section-sub{font-size:.95rem;color:var(--text-muted);max-width:520px;}
+.problema{background:white;}
+.problema-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2.5rem;}
+@media(min-width:600px){.problema-grid{grid-template-columns:1fr 1fr;}}
+@media(min-width:900px){.problema-grid{grid-template-columns:1fr 1fr 1fr;}}
+.problema-item{background:var(--bg);border-radius:16px;padding:1.25rem;border-left:3px solid #ef4444;}
+.problema-icon{font-size:1.5rem;margin-bottom:.5rem;}
+.problema-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:.25rem;}
+.problema-desc{font-size:.8rem;color:var(--text-muted);line-height:1.5;}
+.beneficios-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2.5rem;}
+@media(min-width:600px){.beneficios-grid{grid-template-columns:1fr 1fr;}}
+@media(min-width:900px){.beneficios-grid{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.beneficio-card{background:white;border-radius:16px;padding:1.25rem;border:1px solid var(--border);transition:all .2s;}
+.beneficio-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.07);border-color:rgba(26,158,92,.25);}
+.beneficio-icon{font-size:1.6rem;margin-bottom:.6rem;}
+.beneficio-title{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.25rem;}
+.beneficio-desc{font-size:.78rem;color:var(--text-muted);line-height:1.5;}
+.numeros{background:linear-gradient(135deg,var(--green),var(--green-dark));padding:4rem 1.5rem;}
+.numeros-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:700px;margin:0 auto;text-align:center;}
+@media(min-width:600px){.numeros-grid{grid-template-columns:repeat(4,1fr);}}
+.numero-val{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:white;line-height:1;}
+.numero-lbl{font-size:.78rem;color:rgba(255,255,255,.75);margin-top:.3rem;}
+.depoimentos{background:white;}
+.depo-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:2.5rem;}
+@media(min-width:600px){.depo-grid{grid-template-columns:1fr 1fr;}}
+@media(min-width:900px){.depo-grid{grid-template-columns:1fr 1fr 1fr;}}
+.depo-card{background:var(--bg);border-radius:20px;padding:1.5rem;border:1px solid var(--border);}
+.depo-stars{color:#f59e0b;font-size:1rem;margin-bottom:.75rem;}
+.depo-text{font-size:.875rem;color:var(--text);line-height:1.6;margin-bottom:1rem;font-style:italic;}
+.depo-author{display:flex;align-items:center;gap:.6rem;}
+.depo-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem;flex-shrink:0;}
+.depo-name{font-size:.82rem;font-weight:700;color:var(--text);}
+.depo-city{font-size:.75rem;color:var(--text-muted);}
+.planos-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:2.5rem;max-width:640px;margin-left:auto;margin-right:auto;}
+@media(min-width:600px){.planos-grid{grid-template-columns:1fr 1fr;}}
+.plano-card{background:white;border-radius:20px;padding:1.75rem;border:1px solid var(--border);}
+.plano-card.destaque{border:2px solid var(--green);position:relative;overflow:hidden;}
+.plano-popular{position:absolute;top:0;right:0;background:var(--green);color:white;font-size:.7rem;font-weight:700;padding:.3rem .85rem;border-radius:0 18px 0 10px;}
+.plano-nome{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:.5rem;}
+.plano-preco{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:var(--text);line-height:1;}
+.plano-preco span{font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--text-muted);}
+.plano-trial{font-size:.75rem;color:var(--green);font-weight:600;margin:.35rem 0 1rem;}
+.plano-features{list-style:none;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.5rem;}
+.plano-features li{font-size:.82rem;color:var(--text-muted);display:flex;align-items:center;gap:.5rem;}
+.plano-features li.ok{color:var(--text);}
+.plano-features li.ok::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+.plano-features li.no::before{content:'✕';color:#ccc;flex-shrink:0;}
+.btn-plano{width:100%;padding:.85rem;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:block;text-align:center;}
+.btn-plano.verde{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;box-shadow:0 6px 20px rgba(26,158,92,.25);}
+.btn-plano.verde:hover{transform:translateY(-2px);}
+.btn-plano.outline{background:none;color:var(--text-muted);border:1.5px solid var(--border);}
+.cta-final{background:linear-gradient(160deg,#0f7a42,#1a9e5c 50%,#27c46e);padding:5rem 1.5rem;text-align:center;}
+.cta-final h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;color:white;margin-bottom:.75rem;}
+.cta-final p{font-size:.95rem;color:rgba(255,255,255,.8);margin-bottom:2rem;max-width:420px;margin-left:auto;margin-right:auto;}
+.btn-cta-white{background:white;color:var(--green-dark);border:none;border-radius:14px;padding:.9rem 2rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;box-shadow:0 8px 32px rgba(0,0,0,.15);transition:all .2s;}
+.btn-cta-white:hover{transform:translateY(-2px);}
+.cta-note{font-size:.78rem;color:rgba(255,255,255,.65);margin-top:.75rem;}
+footer{background:#111;padding:2.5rem 1.5rem;text-align:center;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:white;margin-bottom:.5rem;}
+.footer-logo span{color:var(--green);}
+.footer-sub{font-size:.78rem;color:#666;margin-bottom:1.25rem;}
+.footer-links{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;}
+.footer-links a{font-size:.78rem;color:#666;text-decoration:none;}
+.footer-links a:hover{color:var(--green);}
+.footer-copy{font-size:.72rem;color:#444;margin-top:1.25rem;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@media(max-width:599px){.mockup-wrap.side{display:none;}.hero-mockups{gap:0;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="0" width="24" height="7" rx="2" fill="white" opacity="0.95"/>
+        <rect x="16" y="7" width="12" height="5" rx="1" fill="white" opacity="0.9"/>
+        <rect x="2" y="12" width="40" height="30" rx="20" fill="white" opacity="0.95"/>
+        <rect x="16" y="42" width="12" height="5" rx="2" fill="white" opacity="0.9"/>
+        <rect x="20.5" y="16" width="3" height="22" rx="1.5" fill="#1a9e5c"/>
+        <path d="M28 20.5 C28 18 26 17 22 17 C18 17 16 18.5 16 21 C16 23.5 18 24.5 22 25 C26 25.5 28 26.5 28 29 C28 31.5 26 33 22 33 C18 33 16 31.5 16 29.5" stroke="#1a9e5c" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="nav-logo-name">Revenda <span>Pro</span></span>
+  </div>
+  <a href="https://alexsant9634-hash.github.io/revenda-pro/" class="nav-cta">Começar grátis</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-circle hero-circle-1"></div>
+  <div class="hero-circle hero-circle-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">💄 Para revendedoras de cosméticos</div>
+    <h1 class="hero-title">Chega de anotações.<br>Organize suas vendas<br><span>do jeito certo.</span></h1>
+    <p class="hero-sub">Controle clientes, dívidas, estoque e cobranças em um aplicativo feito especialmente para revendedoras de cosméticos.</p>
+    <div class="hero-actions">
+      <a href="https://alexsant9634-hash.github.io/revenda-pro/" class="btn-primary">🚀 Testar grátis por 7 dias</a>
+      <span class="hero-note">Sem cobrança agora · Cancele quando quiser</span>
+    </div>
+  </div>
+
+  <div class="hero-mockups">
+    <!-- MOCKUP ESQUERDO: CATÁLOGO -->
+    <div class="mockup-wrap side">
+      <div class="mockup-label">Catálogo</div>
+      <div class="mockup-phone">
+        <div class="m-status"><span>📦 Produtos</span><span>12 itens</span></div>
+        <div class="m-body">
+          <div class="m-prod"><div class="m-prod-img">💄</div><div class="m-prod-info"><div class="m-prod-nm">Batom Matte Rosa</div><div class="m-prod-pr">R$ 45,00</div><div class="m-prod-st">Estoque: 8 un.</div></div></div>
+          <div class="m-prod"><div class="m-prod-img">✨</div><div class="m-prod-info"><div class="m-prod-nm">Sérum Facial HD</div><div class="m-prod-pr">R$ 89,90</div><div class="m-prod-st">Estoque: 5 un.</div></div></div>
+          <div class="m-prod"><div class="m-prod-img">🌸</div><div class="m-prod-info"><div class="m-prod-nm">Base Liquida Ultra</div><div class="m-prod-pr">R$ 67,00</div><div class="m-prod-st low">⚠ Estoque baixo: 1</div></div></div>
+          <div class="m-prod"><div class="m-prod-img">💅</div><div class="m-prod-info"><div class="m-prod-nm">Esmalte Gel Plus</div><div class="m-prod-pr">R$ 28,00</div><div class="m-prod-st">Estoque: 15 un.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCKUP CENTRAL: DASHBOARD -->
+    <div class="mockup-wrap center">
+      <div class="mockup-label">Dashboard</div>
+      <div class="mockup-phone">
+        <div class="m-status"><span>Revenda Pro</span><span>🔔</span></div>
+        <div class="m-body">
+          <div class="m-hero-dash">
+            <div class="m-greeting">Olá, Maria! 👋</div>
+            <div class="m-dash-name">Resumo do mês</div>
+          </div>
+          <div class="m-cards">
+            <div class="m-card"><div class="m-card-val">R$ 2.340</div><div class="m-card-lbl">Vendas do mês</div><div class="m-card-sub">⏳ 2 pend. · R$ 178</div></div>
+            <div class="m-card"><div class="m-card-val">R$ 1.585</div><div class="m-card-lbl">Lucro estimado</div></div>
+            <div class="m-card"><div class="m-card-val">3</div><div class="m-card-lbl">Pedidos pend.</div></div>
+            <div class="m-card"><div class="m-card-val">18</div><div class="m-card-lbl">Clientes</div></div>
+          </div>
+          <div class="m-sec">👥 Quem está devendo</div>
+          <div class="m-list">
+            <div class="m-item"><div class="m-av">M</div><div class="m-inf"><div class="m-nm">Maria Silva</div><div class="m-vl">R$ 89,90</div></div><span class="m-bg bg-o">Cobrar</span></div>
+            <div class="m-item"><div class="m-av">J</div><div class="m-inf"><div class="m-nm">Julia Rocha</div><div class="m-vl">R$ 67,50</div></div><span class="m-bg bg-o">Cobrar</span></div>
+            <div class="m-item"><div class="m-av">C</div><div class="m-inf"><div class="m-nm">Carla Mendes</div><div class="m-vl">R$ 45,00</div></div><span class="m-bg bg-o">Cobrar</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCKUP DIREITO: PEDIDOS -->
+    <div class="mockup-wrap side">
+      <div class="mockup-label">Pedidos</div>
+      <div class="mockup-phone">
+        <div class="m-status"><span>📋 Pedidos</span><span>Hoje</span></div>
+        <div class="m-body">
+          <div class="m-ped">
+            <div class="m-ped-top"><div><div class="m-ped-prod">Batom Matte Rosa</div><div class="m-ped-cli">Ana Costa · 2 un.</div></div><span class="m-bg bg-g">Pago</span></div>
+            <div class="m-ped-row"><div class="m-ped-val">R$ 90,00</div><div class="m-ped-hr">14:32</div></div>
+            <div class="m-prog"><div class="m-step done"></div><div class="m-step done"></div><div class="m-step done"></div></div>
+          </div>
+          <div class="m-ped">
+            <div class="m-ped-top"><div><div class="m-ped-prod">Sérum Facial HD</div><div class="m-ped-cli">Maria Silva · 1 un.</div></div><span class="m-bg bg-o">Fiado</span></div>
+            <div class="m-ped-row"><div class="m-ped-val">R$ 89,90</div><div class="m-ped-hr">13:15</div></div>
+            <div class="m-prog"><div class="m-step done"></div><div class="m-step act"></div><div class="m-step"></div></div>
+          </div>
+          <div class="m-ped">
+            <div class="m-ped-top"><div><div class="m-ped-prod">Base Liquida Ultra</div><div class="m-ped-cli">Camila Lima · 1 un.</div></div><span class="m-bg bg-g">Pago</span></div>
+            <div class="m-ped-row"><div class="m-ped-val">R$ 67,00</div><div class="m-ped-hr">11:48</div></div>
+            <div class="m-prog"><div class="m-step done"></div><div class="m-step done"></div><div class="m-step done"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="problema">
+  <div class="container">
+    <div class="section-label reveal">O problema</div>
+    <h2 class="section-title reveal">Você ainda usa caderno<br>ou grupos de WhatsApp<br>para controlar suas vendas?</h2>
+    <p class="section-sub reveal">Mais de 4 milhões de revendedoras no Brasil perdem dinheiro todo mês por falta de organização. Veja se você se identifica:</p>
+    <div class="problema-grid">
+      <div class="problema-item reveal"><div class="problema-icon">😰</div><div class="problema-title">Não sabe quem deve e quanto</div><div class="problema-desc">Perdeu a anotação de quem comprou fiado. Clientes somem e você fica sem receber. Dinheiro que nunca volta.</div></div>
+      <div class="problema-item reveal"><div class="problema-icon">📦</div><div class="problema-title">Estoque sempre descontrolado</div><div class="problema-desc">Vende um produto e descobre que acabou. Ou compra mais do que precisa e o dinheiro fica parado em estoque.</div></div>
+      <div class="problema-item reveal"><div class="problema-icon">😬</div><div class="problema-title">Vergonha de cobrar clientes</div><div class="problema-desc">Não sabe como cobrar sem parecer chata. Acaba deixando passar e perdendo dinheiro por isso.</div></div>
+      <div class="problema-item reveal"><div class="problema-icon">📊</div><div class="problema-title">Não sabe o lucro real</div><div class="problema-desc">No final do mês trabalhou muito mas não sabe quanto ganhou de verdade. Não consegue separar custo de lucro.</div></div>
+      <div class="problema-item reveal"><div class="problema-icon">⏰</div><div class="problema-title">Perde horas com burocracia</div><div class="problema-desc">Anota em caderno, passa para planilha, manda mensagem por mensagem. Tempo que poderia usar para vender mais.</div></div>
+      <div class="problema-item reveal"><div class="problema-icon">📱</div><div class="problema-title">Catálogo desatualizado e feio</div><div class="problema-desc">Manda foto de foto dos produtos pelo WhatsApp. Clientes não conseguem ver preço e disponibilidade e desistem.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section>
+  <div class="container">
+    <div class="section-label reveal">Benefícios</div>
+    <h2 class="section-title reveal">8 razões para usar<br><span style="color:var(--green)">o Revenda Pro hoje</span></h2>
+    <p class="section-sub reveal">Cada funcionalidade foi pensada para resolver um problema real do dia a dia de quem revende cosméticos.</p>
+    <div class="beneficios-grid">
+      <div class="beneficio-card reveal"><div class="beneficio-icon">💰</div><div class="beneficio-title">Nunca mais perde dinheiro</div><div class="beneficio-desc">Controle total de quem deve, quanto deve e há quanto tempo. Cobranças automáticas via WhatsApp com Pix.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">⚡</div><div class="beneficio-title">Venda registrada em segundos</div><div class="beneficio-desc">Com a Venda Rápida você registra cliente, produto e valor em menos de 10 segundos. Sem enrolação.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">📊</div><div class="beneficio-title">Sabe exatamente quanto lucrou</div><div class="beneficio-desc">Relatórios por mês e por dia mostram vendas, lucro real e despesas. Dados claros para tomar decisões certas.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">📦</div><div class="beneficio-title">Estoque sempre sob controle</div><div class="beneficio-desc">Alerta automático quando produto está acabando. Nunca mais perde venda por falta de estoque.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">💬</div><div class="beneficio-title">Cobrança profissional e fácil</div><div class="beneficio-desc">Mensagem pronta com lista de produtos, valores e chave Pix. Cobra com um toque, sem constrangimento.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">🛡️</div><div class="beneficio-title">Protege de mau pagadores</div><div class="beneficio-desc">Teto de gastos por cliente bloqueia novas compras fiadas quando a dívida atinge o limite que você definiu.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">📱</div><div class="beneficio-title">Funciona 100% no celular</div><div class="beneficio-desc">Feito para o celular, roda offline e pode ser instalado como app. Funciona onde e quando você precisar.</div></div>
+      <div class="beneficio-card reveal"><div class="beneficio-icon">⏰</div><div class="beneficio-title">Economiza horas toda semana</div><div class="beneficio-desc">O que levava horas em cadernos e planilhas agora leva minutos. Mais tempo para vender e para você mesma.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- NÚMEROS -->
+<div class="numeros">
+  <div class="numeros-grid">
+    <div class="reveal"><div class="numero-val">4M+</div><div class="numero-lbl">Revendedoras no Brasil</div></div>
+    <div class="reveal"><div class="numero-val">7 dias</div><div class="numero-lbl">Grátis para testar</div></div>
+    <div class="reveal"><div class="numero-val">R$19,90</div><div class="numero-lbl">Por mês no Plano Pro</div></div>
+    <div class="reveal"><div class="numero-val">100%</div><div class="numero-lbl">Feito para o celular</div></div>
+  </div>
+</div>
+
+<!-- DEPOIMENTOS -->
+<section class="depoimentos">
+  <div class="container">
+    <div class="section-label reveal">Depoimentos</div>
+    <h2 class="section-title reveal">O que as revendedoras<br>estão dizendo</h2>
+    <div class="depo-grid">
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"Antes eu usava caderno e sempre perdia conta de quem devia. Com o Revenda Pro consigo cobrar pelo WhatsApp com um toque e meu lucro aumentou muito!"</p><div class="depo-author"><div class="depo-avatar">M</div><div><div class="depo-name">Maria S.</div><div class="depo-city">Revendedora Avon · Fortaleza, CE</div></div></div></div>
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"O app é muito fácil de usar. Registro a venda em segundos e já sei quanto lucrei no mês. Nunca mais perdi dinheiro por falta de controle!"</p><div class="depo-author"><div class="depo-avatar">A</div><div><div class="depo-name">Ana P.</div><div class="depo-city">Revendedora Natura · São Paulo, SP</div></div></div></div>
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"O teto de gastos por cliente me salvou! Tinha uma cliente acumulando dívida e eu não conseguia cobrar. Agora o app bloqueia automaticamente e eu fico tranquila."</p><div class="depo-author"><div class="depo-avatar">C</div><div><div class="depo-name">Carla R.</div><div class="depo-city">Revendedora Boticário · Recife, PE</div></div></div></div>
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"Usava planilha do Excel e era um pesadelo. Com o Revenda Pro tudo fica no celular e funciona até sem internet. Indico para todas as minhas colegas revendedoras!"</p><div class="depo-author"><div class="depo-avatar">J</div><div><div class="depo-name">Juliana M.</div><div class="depo-city">Revendedora Mary Kay · Belo Horizonte, MG</div></div></div></div>
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"A cobrança pelo WhatsApp é incrível. A mensagem já vem com todos os produtos que a cliente deve e a chave Pix. Profissional demais! Minhas clientes adoram."</p><div class="depo-author"><div class="depo-avatar">F</div><div><div class="depo-name">Fernanda L.</div><div class="depo-city">Revendedora Eudora · Salvador, BA</div></div></div></div>
+      <div class="depo-card reveal"><div class="depo-stars">★★★★★</div><p class="depo-text">"Em 3 meses usando o app consegui aumentar minhas vendas em 40% porque parei de perder tempo com anotações e foquei em vender. Vale cada centavo do plano Pro!"</p><div class="depo-author"><div class="depo-avatar">P</div><div><div class="depo-name">Patrícia O.</div><div class="depo-city">Revendedora Hinode · Curitiba, PR</div></div></div></div>
+    </div>
+    <p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:1.25rem;" class="reveal">⭐ Alguns depoimentos de nossas usuárias</p>
+  </div>
+</section>
+
+<!-- PLANOS -->
+<section style="background:white;">
+  <div class="container">
+    <div class="section-label reveal" style="text-align:center;">Planos</div>
+    <h2 class="section-title reveal" style="text-align:center;">Comece grátis,<br>cresça com o Pro</h2>
+    <div class="planos-grid">
+      <div class="plano-card reveal">
+        <div class="plano-nome">Grátis</div>
+        <div class="plano-preco">R$ 0<span>/mês</span></div>
+        <div class="plano-trial">Para começar a organizar</div>
+        <ul class="plano-features">
+          <li class="ok">Até 10 clientes</li>
+          <li class="ok">Até 20 pedidos</li>
+          <li class="ok">Até 10 produtos</li>
+          <li class="no">Relatórios completos</li>
+          <li class="no">Fornecedores ilimitados</li>
+          <li class="no">Cobrança em massa</li>
+        </ul>
+        <a href="https://alexsant9634-hash.github.io/revenda-pro/" class="btn-plano outline">Começar grátis</a>
+      </div>
+      <div class="plano-card destaque reveal">
+        <div class="plano-popular">Mais popular</div>
+        <div class="plano-nome">Pro</div>
+        <div class="plano-preco">R$ 19,90<span>/mês</span></div>
+        <div class="plano-trial">🎉 7 dias grátis para testar</div>
+        <ul class="plano-features">
+          <li class="ok">Clientes, pedidos e produtos ilimitados</li>
+          <li class="ok">Relatórios por mês e por dia</li>
+          <li class="ok">Fornecedores ilimitados</li>
+          <li class="ok">Cobrança em massa via WhatsApp + Pix</li>
+          <li class="ok">Controle de estoque com alertas</li>
+          <li class="ok">Teto de gastos por cliente</li>
+          <li class="ok">Venda rápida ⚡</li>
+          <li class="ok">Funciona offline</li>
+        </ul>
+        <a href="https://alexsant9634-hash.github.io/revenda-pro/" class="btn-plano verde">Testar grátis por 7 dias →</a>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:.78rem;color:var(--text-muted);margin-top:1rem;" class="reveal">💳 Cartão necessário apenas para continuar após o teste · Cancele quando quiser</p>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <div class="container">
+    <h2 class="reveal">Pronta para organizar<br>suas vendas de vez?</h2>
+    <p class="reveal">Junte-se a revendedoras que já usam o Revenda Pro para vender mais e trabalhar menos.</p>
+    <a href="https://alexsant9634-hash.github.io/revenda-pro/" class="btn-cta-white reveal">🚀 Começar agora grátis</a>
+    <div class="cta-note reveal">Sem cobrança nos primeiros 7 dias · Cancele quando quiser</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Revenda <span>Pro</span></div>
+  <div class="footer-sub">Gestão inteligente para revendedoras de cosméticos</div>
+  <div class="footer-links">
+    <a href="https://alexsant9634-hash.github.io/revenda-pro/">Acessar o app</a>
+    <a href="mailto:alexsant9634@gmail.com">Contato</a>
+  </div>
+  <div class="footer-copy">© 2026 Revenda Pro · Todos os direitos reservados</div>
+</footer>
+
+<script>
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+</script>
+</body>
+</html>
