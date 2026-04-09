@@ -1048,7 +1048,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="screen" id="screenCatalogo">
       <div class="page-header">
         <h2><span class="ico" style="width:22px;height:22px"><svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span> Catálogo</h2>
-        <button class="whatsapp-btn" style="font-size:.82rem;padding:.5rem 1rem;" onclick="shareCatalogo()"><span class="ico" style="width:14px;height:14px"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span> Compartilhar</button>
+        <button class="whatsapp-btn" style="font-size:.82rem;padding:.5rem 1rem;" onclick="shareCatalogo()"><span class="ico" style="width:14px;height:14px"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span> Catálogo Digital</button>
       </div>
       <div class="search-bar">
         <span class="search-icon"><span class="ico" style="width:16px;height:16px"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></span>
@@ -1274,7 +1274,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="settings-item" onclick="shareCatalogo()">
         <div class="settings-item-left">
           <div class="settings-icon"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></div>
-          <div><div class="settings-label">Link do Catálogo</div><div class="settings-sub">Compartilhar meus produtos</div></div>
+          <div><div class="settings-label">Catálogo Digital</div><div class="settings-sub">Gerar e compartilhar catálogo visual</div></div>
         </div>
         <span class="chevron-right"><span class="ico" style="width:18px;height:18px"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></span>
       </div>
@@ -3476,8 +3476,69 @@ function renderCatalogo(){
 }
 function shareCatalogo(){
   if(!produtos.length){showToast('Adicione produtos primeiro!');return;}
-  const txt='*Meu Catálogo - Revenda Pro*\n\n'+produtos.map(p=>`*${p.nome}*\nR$ ${p.preco.toFixed(2)}${p.desc?'\n'+p.desc:''}`).join('\n\n')+'\n\n_Peça já pelo WhatsApp!_';
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+  var perfil = getPerfil();
+  var nomeConsultora = perfil.nome || userData.name || 'Consultora';
+  var whatsConsultora = perfil.telefone ? perfil.telefone.replace(/\D/g,'') : '';
+  var produtosAtivos = produtos.filter(function(p){return p.estoque > 0;});
+  if(!produtosAtivos.length){showToast('Todos os produtos estão sem estoque!');return;}
+
+  // Gera HTML do catálogo
+  var cardsHTML = produtosAtivos.map(function(p){
+    var fotoHTML = p.foto
+      ? '<img src="'+p.foto+'" style="width:100%;height:160px;object-fit:cover;display:block;" loading="lazy">'
+      : '<div style="width:100%;height:160px;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;font-size:3rem;">💄</div>';
+    var descHTML = p.desc ? '<p style="font-size:.78rem;color:#666;margin:.3rem 0 .6rem;line-height:1.4;">'+escapeHtml(p.desc)+'</p>' : '';
+    var lucroHTML = p.custo ? '<div style="font-size:.7rem;color:#1a9e5c;font-weight:600;margin-bottom:.4rem;">Lucro: R$ '+(p.preco-p.custo).toFixed(2).replace('.',',')+'</div>' : '';
+    var msgWpp = encodeURIComponent('Olá, '+nomeConsultora+'! Vi seu catálogo e tenho interesse no produto: *'+p.nome+'* (R$ '+p.preco.toFixed(2).replace('.',',')+')');
+    var btnWpp = whatsConsultora
+      ? '<a href="https://wa.me/55'+whatsConsultora+'?text='+msgWpp+'" style="display:block;background:linear-gradient(135deg,#1a9e5c,#0f7a42);color:white;text-decoration:none;text-align:center;padding:.6rem;border-radius:8px;font-size:.8rem;font-weight:700;margin-top:.5rem;">💬 Pedir pelo WhatsApp</a>'
+      : '';
+    return '<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);break-inside:avoid;">'+
+      fotoHTML+
+      '<div style="padding:.85rem;">'+
+        '<div style="font-size:.9rem;font-weight:800;color:#111;margin-bottom:.2rem;">'+escapeHtml(p.nome)+'</div>'+
+        descHTML+
+        '<div style="font-size:1.1rem;font-weight:900;color:#1a9e5c;margin-bottom:.25rem;">R$ '+p.preco.toFixed(2).replace('.',',')+'</div>'+
+        '<div style="font-size:.7rem;color:#999;">Estoque: '+p.estoque+' un.</div>'+
+        btnWpp+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html lang="pt-BR"><head>'+
+    '<meta charset="UTF-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1.0">'+
+    '<title>Catálogo de '+escapeHtml(nomeConsultora)+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">'+
+    '<style>'+
+      '*{box-sizing:border-box;margin:0;padding:0;}'+
+      'body{font-family:"Plus Jakarta Sans",sans-serif;background:#f5f5f5;color:#111;}'+
+      '.header{background:linear-gradient(135deg,#1a9e5c,#0f7a42);padding:2rem 1.5rem;text-align:center;}'+
+      '.header-logo{font-size:2rem;margin-bottom:.5rem;}'+
+      '.header-nome{font-size:1.3rem;font-weight:800;color:white;margin-bottom:.25rem;}'+
+      '.header-sub{font-size:.85rem;color:rgba(255,255,255,.8);}'+
+      '.header-badge{display:inline-block;background:rgba(255,255,255,.15);color:white;border-radius:20px;padding:.3rem .85rem;font-size:.75rem;font-weight:700;margin-top:.75rem;}'+
+      '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;padding:1.25rem;max-width:700px;margin:0 auto;}'+
+      '.footer{text-align:center;padding:1.5rem;font-size:.75rem;color:#999;margin-top:.5rem;}'+
+      '.footer span{color:#1a9e5c;font-weight:700;}'+
+      '@media(min-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}}'+
+    '</style>'+
+    '</head><body>'+
+    '<div class="header">'+
+      '<div class="header-logo">💄</div>'+
+      '<div class="header-nome">'+escapeHtml(nomeConsultora)+'</div>'+
+      '<div class="header-sub">Catálogo de Cosméticos</div>'+
+      '<div class="header-badge">✨ '+produtosAtivos.length+' produto'+(produtosAtivos.length>1?'s':'')+' disponíve'+(produtosAtivos.length>1?'is':'l')+'</div>'+
+    '</div>'+
+    '<div class="grid">'+cardsHTML+'</div>'+
+    '<div class="footer">Catálogo gerado pelo <span>Revenda Pro</span> · '+new Date().toLocaleDateString('pt-BR')+'</div>'+
+    '</body></html>';
+
+  // Abre em nova aba
+  var blob = new Blob([html], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  showToast('Catálogo aberto! Compartilhe o link com suas clientes 📲');
 }
 function renderFinancas(){
   const sel=document.getElementById('finMesSel');
