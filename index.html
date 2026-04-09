@@ -3482,63 +3482,182 @@ function shareCatalogo(){
   var produtosAtivos = produtos.filter(function(p){return p.estoque > 0;});
   if(!produtosAtivos.length){showToast('Todos os produtos estão sem estoque!');return;}
 
-  // Gera HTML do catálogo
+  // Categorias únicas
+  var catLabels = {maquiagem:'Maquiagem',skincare:'Skincare',perfume:'Perfume',cabelo:'Cabelo',corpo:'Corpo',outro:'Outros'};
+  var cats = [];
+  produtosAtivos.forEach(function(p){
+    var c = p.cat||'outro';
+    if(cats.indexOf(c)===-1) cats.push(c);
+  });
+
+  // Cards dos produtos
   var cardsHTML = produtosAtivos.map(function(p){
+    var cat = p.cat||'outro';
     var fotoHTML = p.foto
-      ? '<img src="'+p.foto+'" style="width:100%;height:160px;object-fit:cover;display:block;" loading="lazy">'
-      : '<div style="width:100%;height:160px;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;font-size:3rem;">💄</div>';
-    var descHTML = p.desc ? '<p style="font-size:.78rem;color:#666;margin:.3rem 0 .6rem;line-height:1.4;">'+escapeHtml(p.desc)+'</p>' : '';
-    var lucroHTML = p.custo ? '<div style="font-size:.7rem;color:#1a9e5c;font-weight:600;margin-bottom:.4rem;">Lucro: R$ '+(p.preco-p.custo).toFixed(2).replace('.',',')+'</div>' : '';
-    var msgWpp = encodeURIComponent('Olá, '+nomeConsultora+'! Vi seu catálogo e tenho interesse no produto: *'+p.nome+'* (R$ '+p.preco.toFixed(2).replace('.',',')+')');
+      ? '<img src="'+p.foto+'" alt="'+escapeHtml(p.nome)+'" style="width:100%;height:200px;object-fit:cover;display:block;transition:transform .3s;" class="prod-img">'
+      : '<div style="width:100%;height:200px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;"><span style="font-size:3.5rem;">💄</span><span style="font-size:.7rem;color:#1a9e5c;font-weight:600;">Sem foto</span></div>';
+    var descHTML = p.desc ? '<p class="prod-desc">'+escapeHtml(p.desc)+'</p>' : '';
+    var msgWpp = encodeURIComponent('Olá, '+nomeConsultora+'! 😊\n\nVi seu catálogo e tenho interesse no produto:\n\n*'+p.nome+'*\nValor: R$ '+p.preco.toFixed(2).replace('.',',')+'\n\nPoderia me ajudar?');
     var btnWpp = whatsConsultora
-      ? '<a href="https://wa.me/55'+whatsConsultora+'?text='+msgWpp+'" style="display:block;background:linear-gradient(135deg,#1a9e5c,#0f7a42);color:white;text-decoration:none;text-align:center;padding:.6rem;border-radius:8px;font-size:.8rem;font-weight:700;margin-top:.5rem;">💬 Pedir pelo WhatsApp</a>'
-      : '';
-    return '<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);break-inside:avoid;">'+
-      fotoHTML+
-      '<div style="padding:.85rem;">'+
-        '<div style="font-size:.9rem;font-weight:800;color:#111;margin-bottom:.2rem;">'+escapeHtml(p.nome)+'</div>'+
+      ? '<a href="https://wa.me/55'+whatsConsultora+'?text='+msgWpp+'" class="btn-wpp">💬 Pedir pelo WhatsApp</a>'
+      : '<div style="font-size:.75rem;color:#999;text-align:center;padding:.5rem;">WhatsApp não configurado</div>';
+    return '<div class="prod-card" data-cat="'+cat+'" data-nome="'+escapeHtml(p.nome).toLowerCase()+'">'+
+      '<div class="prod-img-wrap">'+fotoHTML+'</div>'+
+      '<div class="prod-body">'+
+        '<div class="prod-cat-badge">'+escapeHtml(catLabels[cat]||cat)+'</div>'+
+        '<div class="prod-nome">'+escapeHtml(p.nome)+'</div>'+
         descHTML+
-        '<div style="font-size:1.1rem;font-weight:900;color:#1a9e5c;margin-bottom:.25rem;">R$ '+p.preco.toFixed(2).replace('.',',')+'</div>'+
-        '<div style="font-size:.7rem;color:#999;">Estoque: '+p.estoque+' un.</div>'+
+        '<div class="prod-preco">R$ '+p.preco.toFixed(2).replace('.',',')+'</div>'+
+        '<div class="prod-estq">'+p.estoque+' unidade'+(p.estoque>1?'s':'')+' disponíve'+(p.estoque>1?'is':'l')+'</div>'+
         btnWpp+
       '</div>'+
     '</div>';
   }).join('');
 
+  // Sidebar categorias
+  var sidebarHTML = '<li class="cat-item active" data-cat="all" onclick="filtrarCat(this,\'all\')">✨ Todos os produtos <span class="cat-count">'+produtosAtivos.length+'</span></li>'+
+    cats.map(function(c){
+      var qtd = produtosAtivos.filter(function(p){return (p.cat||'outro')===c;}).length;
+      return '<li class="cat-item" data-cat="'+c+'" onclick="filtrarCat(this,\''+c+'\')">'+escapeHtml(catLabels[c]||c)+' <span class="cat-count">'+qtd+'</span></li>';
+    }).join('');
+
+  var css = [
+    '*{box-sizing:border-box;margin:0;padding:0;}',
+    'body{font-family:"Plus Jakarta Sans",sans-serif;background:#f8f8f8;color:#111;min-height:100vh;}',
+    // Header
+    '.header{background:#1a9e5c;padding:0 1.5rem;height:64px;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,158,92,.3);}',
+    '.header-logo{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}',
+    '.header-logo-icon{width:36px;height:36px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}',
+    '.header-logo-nome{font-size:1rem;font-weight:800;color:white;white-space:nowrap;}',
+    '.header-search{flex:1;max-width:480px;margin:0 auto;position:relative;}',
+    '.header-search input{width:100%;padding:.65rem 1rem .65rem 2.5rem;border-radius:10px;border:none;font-family:"Plus Jakarta Sans",sans-serif;font-size:.9rem;outline:none;background:rgba(255,255,255,.95);}',
+    '.header-search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#999;}',
+    '.header-wpp{background:white;color:#1a9e5c;border:none;border-radius:10px;padding:.55rem 1rem;font-family:"Plus Jakarta Sans",sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}',
+    // Layout
+    '.layout{display:flex;gap:0;max-width:1200px;margin:0 auto;}',
+    // Sidebar
+    '.sidebar{width:200px;flex-shrink:0;background:white;min-height:calc(100vh - 64px);padding:1.5rem 1rem;border-right:1px solid #eee;}',
+    '.sidebar-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1a9e5c;margin-bottom:1rem;}',
+    '.cat-list{list-style:none;display:flex;flex-direction:column;gap:.25rem;}',
+    '.cat-item{padding:.55rem .75rem;border-radius:8px;font-size:.85rem;cursor:pointer;color:#555;display:flex;align-items:center;justify-content:space-between;transition:all .15s;}',
+    '.cat-item:hover{background:#f0fdf4;color:#1a9e5c;}',
+    '.cat-item.active{background:#1a9e5c;color:white;font-weight:700;}',
+    '.cat-item.active .cat-count{background:rgba(255,255,255,.25);color:white;}',
+    '.cat-count{font-size:.7rem;background:#f0fdf4;color:#1a9e5c;border-radius:10px;padding:.1rem .4rem;font-weight:700;}',
+    // Main
+    '.main{flex:1;padding:1.5rem;}',
+    '.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}',
+    '.main-title{font-size:1.1rem;font-weight:800;color:#111;}',
+    '.main-count{font-size:.82rem;color:#888;}',
+    // Grid
+    '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.25rem;}',
+    '.prod-card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.06);transition:all .2s;cursor:default;}',
+    '.prod-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.12);}',
+    '.prod-card.hidden{display:none;}',
+    '.prod-img-wrap{overflow:hidden;}',
+    '.prod-img-wrap:hover .prod-img{transform:scale(1.05);}',
+    '.prod-body{padding:1rem;}',
+    '.prod-cat-badge{display:inline-block;background:#f0fdf4;color:#1a9e5c;font-size:.68rem;font-weight:700;border-radius:6px;padding:.18rem .5rem;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.04em;}',
+    '.prod-nome{font-size:1rem;font-weight:800;color:#111;margin-bottom:.4rem;line-height:1.3;}',
+    '.prod-desc{font-size:.8rem;color:#666;line-height:1.5;margin-bottom:.6rem;}',
+    '.prod-preco{font-size:1.4rem;font-weight:900;color:#1a9e5c;margin-bottom:.25rem;}',
+    '.prod-estq{font-size:.72rem;color:#aaa;margin-bottom:.75rem;}',
+    '.btn-wpp{display:block;background:#1a9e5c;color:white;text-decoration:none;text-align:center;padding:.65rem;border-radius:10px;font-size:.82rem;font-weight:700;transition:opacity .2s;}',
+    '.btn-wpp:hover{opacity:.88;}',
+    // Empty state
+    '.empty{text-align:center;padding:4rem 1rem;color:#aaa;}',
+    '.empty-icon{font-size:3rem;margin-bottom:1rem;}',
+    // Footer
+    '.footer{text-align:center;padding:2rem 1rem;font-size:.75rem;color:#bbb;border-top:1px solid #eee;margin-top:1rem;}',
+    '.footer span{color:#1a9e5c;font-weight:700;}',
+    // Mobile
+    '@media(max-width:640px){',
+      '.sidebar{display:none;}',
+      '.header-logo-nome{display:none;}',
+      '.grid{grid-template-columns:repeat(2,1fr);gap:.75rem;}',
+      '.main{padding:1rem;}',
+      '.prod-preco{font-size:1.1rem;}',
+    '}',
+  ].join('');
+
+  var wppAllMsg = encodeURIComponent('Olá! Quero ver o catálogo de cosméticos da '+nomeConsultora+' 💄');
+  var wppBtn = whatsConsultora
+    ? '<a href="https://wa.me/55'+whatsConsultora+'?text='+wppAllMsg+'" class="header-wpp">💬 Falar comigo</a>'
+    : '';
+
   var html = '<!DOCTYPE html><html lang="pt-BR"><head>'+
     '<meta charset="UTF-8">'+
     '<meta name="viewport" content="width=device-width,initial-scale=1.0">'+
-    '<title>Catálogo de '+escapeHtml(nomeConsultora)+'</title>'+
+    '<title>Catálogo · '+escapeHtml(nomeConsultora)+'</title>'+
     '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">'+
-    '<style>'+
-      '*{box-sizing:border-box;margin:0;padding:0;}'+
-      'body{font-family:"Plus Jakarta Sans",sans-serif;background:#f5f5f5;color:#111;}'+
-      '.header{background:linear-gradient(135deg,#1a9e5c,#0f7a42);padding:2rem 1.5rem;text-align:center;}'+
-      '.header-logo{font-size:2rem;margin-bottom:.5rem;}'+
-      '.header-nome{font-size:1.3rem;font-weight:800;color:white;margin-bottom:.25rem;}'+
-      '.header-sub{font-size:.85rem;color:rgba(255,255,255,.8);}'+
-      '.header-badge{display:inline-block;background:rgba(255,255,255,.15);color:white;border-radius:20px;padding:.3rem .85rem;font-size:.75rem;font-weight:700;margin-top:.75rem;}'+
-      '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;padding:1.25rem;max-width:700px;margin:0 auto;}'+
-      '.footer{text-align:center;padding:1.5rem;font-size:.75rem;color:#999;margin-top:.5rem;}'+
-      '.footer span{color:#1a9e5c;font-weight:700;}'+
-      '@media(min-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}}'+
-    '</style>'+
+    '<style>'+css+'</style>'+
     '</head><body>'+
-    '<div class="header">'+
-      '<div class="header-logo">💄</div>'+
-      '<div class="header-nome">'+escapeHtml(nomeConsultora)+'</div>'+
-      '<div class="header-sub">Catálogo de Cosméticos</div>'+
-      '<div class="header-badge">✨ '+produtosAtivos.length+' produto'+(produtosAtivos.length>1?'s':'')+' disponíve'+(produtosAtivos.length>1?'is':'l')+'</div>'+
+
+    // Header
+    '<header class="header">'+
+      '<div class="header-logo">'+
+        '<div class="header-logo-icon">💄</div>'+
+        '<span class="header-logo-nome">'+escapeHtml(nomeConsultora)+'</span>'+
+      '</div>'+
+      '<div class="header-search">'+
+        '<span class="header-search-icon">🔍</span>'+
+        '<input type="text" id="searchInput" placeholder="O que você procura?" oninput="buscar(this.value)">'+
+      '</div>'+
+      wppBtn+
+    '</header>'+
+
+    // Layout
+    '<div class="layout">'+
+      '<aside class="sidebar">'+
+        '<div class="sidebar-title">Categorias</div>'+
+        '<ul class="cat-list" id="catList">'+sidebarHTML+'</ul>'+
+      '</aside>'+
+      '<main class="main">'+
+        '<div class="main-header">'+
+          '<div class="main-title" id="mainTitle">Todos os produtos</div>'+
+          '<div class="main-count" id="mainCount">'+produtosAtivos.length+' produto'+(produtosAtivos.length>1?'s':'')+'</div>'+
+        '</div>'+
+        '<div class="grid" id="prodGrid">'+cardsHTML+'</div>'+
+        '<div class="empty" id="emptyState" style="display:none;">'+
+          '<div class="empty-icon">🔍</div>'+
+          '<div>Nenhum produto encontrado</div>'+
+        '</div>'+
+      '</main>'+
     '</div>'+
-    '<div class="grid">'+cardsHTML+'</div>'+
-    '<div class="footer">Catálogo gerado pelo <span>Revenda Pro</span> · '+new Date().toLocaleDateString('pt-BR')+'</div>'+
+
+    '<footer class="footer">Catálogo gerado pelo <span>Revenda Pro</span> · '+new Date().toLocaleDateString('pt-BR')+'</footer>'+
+
+    '<script>'+
+    'var catAtual="all";'+
+    'function filtrarCat(el,cat){'+
+      'catAtual=cat;'+
+      'document.querySelectorAll(".cat-item").forEach(function(i){i.classList.remove("active");});'+
+      'el.classList.add("active");'+
+      'document.getElementById("searchInput").value="";'+
+      'aplicarFiltros();'+
+    '}'+
+    'function buscar(q){aplicarFiltros(q);}'+
+    'function aplicarFiltros(q){'+
+      'q=(q||document.getElementById("searchInput").value).toLowerCase().trim();'+
+      'var cards=document.querySelectorAll(".prod-card");'+
+      'var vis=0;'+
+      'cards.forEach(function(c){'+
+        'var catOk=catAtual==="all"||c.dataset.cat===catAtual;'+
+        'var busOk=!q||c.dataset.nome.indexOf(q)!==-1;'+
+        'if(catOk&&busOk){c.classList.remove("hidden");vis++;}'+
+        'else{c.classList.add("hidden");}'+
+      '});'+
+      'document.getElementById("mainCount").textContent=vis+" produto"+(vis!==1?"s":"");'+
+      'document.getElementById("emptyState").style.display=vis===0?"block":"none";'+
+      'document.getElementById("prodGrid").style.display=vis===0?"none":"grid";'+
+    '}'+
+    '</sc'+'ript>'+
     '</body></html>';
 
-  // Abre em nova aba
-  var blob = new Blob([html], {type:'text/html'});
+  var blob = new Blob([html], {type:'text/html;charset=utf-8'});
   var url = URL.createObjectURL(blob);
   window.open(url, '_blank');
-  showToast('Catálogo aberto! Compartilhe o link com suas clientes 📲');
+  showToast('Catálogo digital aberto! Compartilhe com suas clientes 📲');
 }
 function renderFinancas(){
   const sel=document.getElementById('finMesSel');
