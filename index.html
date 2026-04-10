@@ -2489,6 +2489,12 @@ function verificarLembretesPendentes(){
 }
 
 function adicionarNotificacao(n){
+  // Evita duplicata — não adiciona se já existe notificação com mesmo título hoje
+  var hoje = new Date().toDateString();
+  var jaExiste = notificacoes.some(function(x){
+    return x.titulo === n.titulo && x.hora && new Date(x.hora).toDateString() === hoje;
+  });
+  if(jaExiste) return;
   notificacoes.unshift({...n, id: Date.now()+Math.random(), lida:false});
   if(notificacoes.length > 50) notificacoes = notificacoes.slice(0,50);
   localStorage.setItem('rp_notifs', JSON.stringify(notificacoes));
@@ -2601,9 +2607,17 @@ function removerNotificacaoAnimado(id,btn){
   }
 }
 function removerNotificacao(id){
-  notificacoes = notificacoes.filter(n=>String(n.id)!==String(id));
+  notificacoes = notificacoes.filter(function(n){return String(n.id)!==String(id);});
   localStorage.setItem('rp_notifs', JSON.stringify(notificacoes));
-  abrirNotificacoes(); // re-render
+  // Remove apenas o item do DOM sem re-renderizar tudo
+  var el = document.querySelector('.notif-item[data-notif-id="'+id+'"]');
+  if(el) el.remove();
+  // Se ficou vazio, mostra mensagem
+  var panel = document.getElementById('notifPanel');
+  if(panel && notificacoes.length===0){
+    panel.innerHTML='<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1.2rem;text-align:center;color:var(--text-muted);font-size:.83rem;">Nenhuma notificação ainda</div>';
+  }
+  atualizarBadge();
 }
 
 function limparNotificacoes(){
