@@ -705,6 +705,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .entrega-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;}
 .entrega-badge.aguardando{background:rgba(52,152,219,.12);color:var(--blue);}
 .entrega-badge.saiu{background:rgba(243,156,18,.12);color:var(--orange);}
+.entrega-badge.retirada{background:rgba(155,89,182,.12);color:#9b59b6;}
 .entrega-badge.entregue{background:rgba(46,204,113,.12);color:var(--green);}
 
 /* LISTA REPOSICAO */
@@ -1440,9 +1441,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     <div class="form-group"><label class="form-label">Status de entrega</label>
       <select class="form-input" id="pedEntrega">
-        <option value="aguardando">Aguardando entrega</option>
-        <option value="saiu">Saiu para entrega</option>
-        <option value="entregue">Entregue</option>
+        <option value="aguardando">📦 Aguardando</option>
+        <option value="saiu">🛵 Saiu para entrega</option>
+        <option value="retirada">🏪 Retirada pelo cliente</option>
+        <option value="entregue">✅ Entregue</option>
       </select>
     </div>
     <!-- TETO WARNING -->
@@ -4002,10 +4004,11 @@ function renderPedidosFiltrados(){
         ${temWhats?`<button class="whatsapp-btn" onclick="enviarPedidoWhats(${p.id})"><span class="ico" style="width:12px;height:12px"><svg width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span> Enviar</button>`:''}
       </div>
       <div style="width:100%;padding-left:46px;margin-top:.1rem;display:flex;align-items:center;gap:.5rem;">
-        <span class="entrega-badge ${p.entrega||'aguardando'}">${{aguardando:'📦 Aguardando',saiu:'🛵 Saiu p/ entrega',entregue:'✅ Entregue'}[p.entrega||'aguardando']}</span>
+        <span class="entrega-badge ${p.entrega||'aguardando'}">${{aguardando:'📦 Aguardando',saiu:'🛵 Saiu p/ entrega',retirada:'🏪 Retirada',entregue:'✅ Entregue'}[p.entrega||'aguardando']}</span>
         <select style="font-size:.68rem;padding:2px 6px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);cursor:pointer;" onchange="atualizarEntrega(${p.id},this.value)">
           <option value="aguardando" ${(p.entrega||'aguardando')==='aguardando'?'selected':''}>📦 Aguardando</option>
           <option value="saiu" ${p.entrega==='saiu'?'selected':''}>🛵 Saiu p/ entrega</option>
+          <option value="retirada" ${p.entrega==='retirada'?'selected':''}>🏪 Retirada pelo cliente</option>
           <option value="entregue" ${p.entrega==='entregue'?'selected':''}>✅ Entregue</option>
         </select>
       </div>
@@ -4518,7 +4521,7 @@ function atualizarEntrega(pedidoId, status){
   salvarStorage();
   if(p._supa_id) _supaUpdate('pedidos',p._supa_id,{entrega:status});
   renderPedidos();
-  const labels={aguardando:'📦 Aguardando',saiu:'🛵 Saiu para entrega',entregue:'✅ Entregue'};
+  const labels={aguardando:'📦 Aguardando',saiu:'🛵 Saiu para entrega',retirada:'🏪 Retirada pelo cliente',entregue:'✅ Entregue'};
   showToast(labels[status]);
 }
 // ── END ENTREGA ───────────────────────────────────────────────
