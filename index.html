@@ -882,6 +882,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="form-group"><label class="form-label">Seu nome</label><input type="text" class="form-input" placeholder="Maria Silva" id="regName"></div>
     <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" placeholder="seu@email.com" id="regEmail"></div>
     <div class="form-group"><label class="form-label">Senha</label><div style="position:relative;"><input type="password" class="form-input" placeholder="Mín. 6 caracteres" id="regPass" style="padding-right:2.5rem;"><button type="button" onclick="toggleSenha('regPass',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;display:flex;align-items:center;"><svg id="regPassIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+    <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:1rem;">
+      <input type="checkbox" id="regTermos" style="margin-top:3px;accent-color:var(--rose);flex-shrink:0;">
+      <label for="regTermos" style="font-size:.75rem;color:var(--text-muted);line-height:1.4;cursor:pointer;">Li e aceito a <a href="https://alexsant9634-hash.github.io/revenda-pro/legal.html" target="_blank" style="color:var(--rose);font-weight:600;">Política de Privacidade</a> e os <a href="https://alexsant9634-hash.github.io/revenda-pro/legal.html" target="_blank" style="color:var(--rose);font-weight:600;">Termos de Uso</a> do Revenda Pro.</label>
+    </div>
     <button class="btn btn-primary" onclick="register()">Criar conta grátis</button>
     <p class="auth-switch">Já tem conta? <a onclick="showScreen2('login')">Entrar</a></p>
   </div>
@@ -1320,6 +1324,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       </div>
 
       <button class="logout-btn" onclick="logout()"><span class="ico" style="width:16px;height:16px"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Sair da conta</button>
+      <div style="text-align:center;margin-top:1rem;padding-bottom:.5rem;">
+        <a href="https://alexsant9634-hash.github.io/revenda-pro/legal.html" target="_blank" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">Política de Privacidade</a>
+        <span style="color:var(--border);margin:0 .4rem;">·</span>
+        <a href="https://alexsant9634-hash.github.io/revenda-pro/legal.html" target="_blank" style="font-size:.72rem;color:var(--text-muted);text-decoration:none;">Termos de Uso</a>
+      </div>
     </div>
 
   </div>
@@ -2045,6 +2054,8 @@ function register(){
   var pass  = document.getElementById('regPass').value;
   if(!name||!email||!pass){showToast('Preencha todos os campos');return;}
   if(pass.length<6){showToast('Senha deve ter mín. 6 caracteres');return;}
+  var termosCheck = document.getElementById('regTermos');
+  if(termosCheck && !termosCheck.checked){showToast('Aceite os Termos de Uso para continuar');return;}
   var btn = document.querySelector('#registerScreen .btn-primary');
   if(btn){btn.disabled=true;btn.textContent='Criando conta...';}
   var supa = getSupa();
