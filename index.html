@@ -1964,14 +1964,45 @@ function gerenciarAssinatura(){
 function verificarPlanoSupabase(){
   var supa = getSupa(); var uid = _uid();
   if(!supa||!uid) return;
-  supa.from('usuarios').select('plano, trial_expira_em').eq('id',uid).single().then(function(r){
-    if(r.data && r.data.plano){
-      userData.plano = r.data.plano;
-      userData.trialExpiraEm = r.data.trial_expira_em || null;
-      salvarStorage();
+
+  // Pega o token JWT da sessão atual
+  supa.auth.getSession().then(function(res){
+    var token = res.data&&res.data.session ? res.data.session.access_token : null;
+    if(!token){
+      // Sem token — usa plano local como fallback
       renderPlanoAtual();
       aplicarLimitesPlano();
+      return;
     }
+
+    // Valida plano no servidor — não confia no cliente
+    fetch(VERCEL_API+'/api/validar-plano', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({userId:uid, token:token})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.plano){
+        userData.plano = data.plano;
+        if(data.trial_expira_em) userData.trialExpiraEm = data.trial_expira_em;
+        salvarStorage();
+        renderPlanoAtual();
+        aplicarLimitesPlano();
+        // Atualiza banner do dashboard
+        var banner = document.getElementById('dashBannerPro');
+        if(banner) banner.style.display = isPro() ? 'none' : 'block';
+      }
+    }).catch(function(){
+      // Falha de rede — usa plano do Supabase direto como fallback
+      supa.from('usuarios').select('plano, trial_expira_em').eq('id',uid).single().then(function(r){
+        if(r.data && r.data.plano){
+          userData.plano = r.data.plano;
+          userData.trialExpiraEm = r.data.trial_expira_em || null;
+          salvarStorage();
+          renderPlanoAtual();
+          aplicarLimitesPlano();
+        }
+      });
+    });
   });
 }
 
