@@ -2979,19 +2979,40 @@ function salvarCliente(){
     return;
   }
   var novaCliente={id:Date.now(),nome,whats,status,obs,aniv,divida:0,teto:tetoVal};
-  clientes.push(novaCliente);
-  salvarStorage();
-  _supaInsert('clientes',_mapCliente(novaCliente)).then(function(row){
-    if(row){
-      novaCliente._supa_id=row.id;
-      novaCliente.id=row.id; // usa id do Supabase
+  var supa=getSupa(); var uid=_uid();
+  if(supa&&uid){
+    var btnSalvar=document.getElementById('btnSalvarCliente')||document.querySelector('#modalCliente .btn-primary');
+    if(btnSalvar){btnSalvar.disabled=true;btnSalvar.textContent='Salvando...';}
+    _supaInsert('clientes',_mapCliente(novaCliente)).then(function(row){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar Cliente';}
+      if(row){
+        novaCliente.id=row.id;
+        novaCliente._supa_id=row.id;
+      }
+      clientes.push(novaCliente);
       salvarStorage();
-    }
-  });
-  fecharModalCliente();
-  renderClientes('all');
-  atualizarDashboard();
-  showToast('Cliente salva!');
+      fecharModalCliente();
+      renderClientes('all');
+      atualizarDashboard();
+      showToast('Cliente salva!');
+    }).catch(function(){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar Cliente';}
+      // Fallback — salva localmente mesmo sem Supabase
+      clientes.push(novaCliente);
+      salvarStorage();
+      fecharModalCliente();
+      renderClientes('all');
+      atualizarDashboard();
+      showToast('Cliente salva localmente!');
+    });
+  } else {
+    clientes.push(novaCliente);
+    salvarStorage();
+    fecharModalCliente();
+    renderClientes('all');
+    atualizarDashboard();
+    showToast('Cliente salva!');
+  }
 }
 function toggleTetoInput(){
   const ativo=document.getElementById('cliTetoToggle').classList.toggle('on');
@@ -3430,14 +3451,33 @@ function salvarProduto(){
     return;
   }
   var novoProduto={id:Date.now(),nome,cat,preco,custo,estoque,estoqueMin,desc,foto};
-  produtos.push(novoProduto);
-  salvarStorage();
-  _supaInsert('produtos',_mapProduto(novoProduto)).then(function(row){
-    if(row){novoProduto._supa_id=row.id;salvarStorage();}
-  });
-  fecharModalProduto();
-  renderCatalogo();
-  showToast('Produto salvo!');
+  var supa=getSupa(); var uid=_uid();
+  var btnSalvar=document.querySelector('#modalProduto .btn-primary');
+  if(supa&&uid){
+    if(btnSalvar){btnSalvar.disabled=true;btnSalvar.textContent='Salvando...';}
+    _supaInsert('produtos',_mapProduto(novoProduto)).then(function(row){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar Produto';}
+      if(row){novoProduto.id=row.id;novoProduto._supa_id=row.id;}
+      produtos.push(novoProduto);
+      salvarStorage();
+      fecharModalProduto();
+      renderCatalogo();
+      showToast('Produto salvo!');
+    }).catch(function(){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar Produto';}
+      produtos.push(novoProduto);
+      salvarStorage();
+      fecharModalProduto();
+      renderCatalogo();
+      showToast('Produto salvo localmente!');
+    });
+  } else {
+    produtos.push(novoProduto);
+    salvarStorage();
+    fecharModalProduto();
+    renderCatalogo();
+    showToast('Produto salvo!');
+  }
 }
 // ── END PRODUTO ────────────────────────────────────────────────
 function buscarCatalogo(q){
@@ -4177,15 +4217,36 @@ function salvarDespesa(){
   const mes=sel&&sel.value!=='todos'?parseInt(sel.value):new Date().getMonth();
   const ano=new Date().getFullYear();
   var novaDespesa={id:Date.now(),nome,valor,cat,mes,ano,data:new Date().toLocaleDateString('pt-BR')};
-  despesas.push(novaDespesa);
-  salvarStorage();
-  _supaInsert('despesas',_mapDespesa(novaDespesa)).then(function(row){
-    if(row){novaDespesa._supa_id=row.id;salvarStorage();}
-  });
-  closeModal('modalDespesa');
-  renderDespesas();
-  renderFinancas();
-  showToast('Despesa registrada!');
+  var supa=getSupa(); var uid=_uid();
+  var btnSalvar=document.querySelector('#modalDespesa .btn-primary');
+  if(supa&&uid){
+    if(btnSalvar){btnSalvar.disabled=true;btnSalvar.textContent='Salvando...';}
+    _supaInsert('despesas',_mapDespesa(novaDespesa)).then(function(row){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar';}
+      if(row){novaDespesa.id=row.id;novaDespesa._supa_id=row.id;}
+      despesas.push(novaDespesa);
+      salvarStorage();
+      closeModal('modalDespesa');
+      renderDespesas();
+      renderFinancas();
+      showToast('Despesa registrada!');
+    }).catch(function(){
+      if(btnSalvar){btnSalvar.disabled=false;btnSalvar.textContent='Salvar';}
+      despesas.push(novaDespesa);
+      salvarStorage();
+      closeModal('modalDespesa');
+      renderDespesas();
+      renderFinancas();
+      showToast('Despesa salva localmente!');
+    });
+  } else {
+    despesas.push(novaDespesa);
+    salvarStorage();
+    closeModal('modalDespesa');
+    renderDespesas();
+    renderFinancas();
+    showToast('Despesa registrada!');
+  }
 }
 function renderDespesas(){
   const sel=document.getElementById('finMesSel');
@@ -4452,20 +4513,22 @@ function confirmarPedidoRapido(){
   const valor=_prProd.preco*_prQtd;
   var novoPedidoRapido={id:Date.now(),cliId:_prCli.id,prodId:_prProd.id,valor,pagamento:_prPagto,qtd:_prQtd,
     data:new Date().toLocaleDateString('pt-BR'),cliente:_prCli.nome,produto:_prProd.nome,entrega:'aguardando'};
+  // Atualiza estoque e dívida localmente imediato
+  if(_prProd) _prProd.estoque=Math.max(0,_prProd.estoque-_prQtd);
   pedidos.push(novoPedidoRapido);
   recalcularDividas();
-  if(_prProd)_prProd.estoque=Math.max(0,_prProd.estoque-_prQtd);
   salvarStorage();
-  // sync Supabase
-  _supaInsert('pedidos',_mapPedido(novoPedidoRapido)).then(function(row){
-    if(row){novoPedidoRapido._supa_id=row.id;salvarStorage();}
-  });
-  if(_prProd&&_prProd._supa_id) _supaUpdate('produtos',_prProd._supa_id,_mapProduto(_prProd));
-  dispararNotifPedido(novoPedidoRapido,_prCli);
+  // Fecha modal e atualiza UI imediatamente
   document.getElementById('prapidoOverlay').classList.remove('open');
   renderPedidos();renderClientes('all');atualizarDashboard();renderCatalogo();
   tocarSomVenda();
   showToast('Venda registrada! ⚡');
+  // Sync Supabase em background — atualiza ID após retorno
+  _supaInsert('pedidos',_mapPedido(novoPedidoRapido)).then(function(row){
+    if(row){novoPedidoRapido.id=row.id;novoPedidoRapido._supa_id=row.id;salvarStorage();}
+  });
+  if(_prProd&&_prProd._supa_id) _supaUpdate('produtos',_prProd._supa_id,_mapProduto(_prProd));
+  dispararNotifPedido(novoPedidoRapido,_prCli);
 }
 // ── END PEDIDO RÁPIDO ─────────────────────────────────────────
 
