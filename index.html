@@ -6,6 +6,32 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Sentry — monitoramento de erros em produção -->
+<script
+  src="https://js.sentry-cdn.com/5d5bf2e6d1293251d2a6960a1070535d.min.js"
+  crossorigin="anonymous"
+></script>
+<script>
+Sentry.onLoad(function(){
+  Sentry.init({
+    environment: 'production',
+    release: 'revenda-pro@1.0.0',
+    beforeSend: function(event){
+      // Não envia erros de extensões do navegador
+      if(event.exception){
+        var values = event.exception.values;
+        if(values && values[0] && values[0].stacktrace){
+          var frames = values[0].stacktrace.frames;
+          if(frames && frames.some(function(f){
+            return f.filename && (f.filename.indexOf('extension') > -1 || f.filename.indexOf('chrome-extension') > -1);
+          })) return null;
+        }
+      }
+      return event;
+    }
+  });
+});
+</script>
 <meta name="apple-mobile-web-app-title" content="Revenda Pro">
 <meta name="theme-color" content="#1a9e5c">
 <meta name="description" content="Gestão inteligente para revendedoras de cosméticos">
@@ -2080,7 +2106,8 @@ function login(){
     localStorage.setItem('rp_perfil', JSON.stringify(pfAtual));
     salvarStorage();
     carregarDadosSupabase();
-  }).catch(function(){
+    // Identifica usuária no Sentry para rastrear erros por conta
+    try{Sentry.setUser({id:user.id, email:user.email});}catch(e){}
     if(btn){btn.disabled=false;btn.textContent='Entrar na minha conta';}
     showToast('⚠️ Erro de conexão. Verifique sua internet e tente novamente.');
   });
@@ -2123,6 +2150,8 @@ function register(){
 function logout(){
   var supa = getSupa();
   if(supa) supa.auth.signOut();
+  // Limpa usuária do Sentry
+  try{Sentry.setUser(null);}catch(e){}
   // Preserva dados do dispositivo
   var perfilSalvo = localStorage.getItem('rp_perfil');
   var configSalvo = localStorage.getItem('rp_config');
